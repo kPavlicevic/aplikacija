@@ -8,7 +8,7 @@ use recenzijaNaFilm;
 create table film(
 	sifra int not null primary key identity (1,1),
 	naziv varchar (50) not null,
-	godina char (4),
+	godina varchar (5),
 	redatelj varchar (50) not null,
 	zanr varchar (50) not null
 );

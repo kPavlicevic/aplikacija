@@ -51,3 +51,34 @@ alter table recenzija add foreign key (korisnik) references korisnik(sifra);
 alter table recenzija add foreign key (film) references film(sifra);
 alter table ocjena add foreign key (korisnik) references korisnik(sifra);
 alter table ocjena add foreign key (film) references film(sifra);
+
+
+ select * from film;
+
+ insert into film (naziv,godina,redatelj,zanr)
+ values
+	('The Lion King','2019','Jon Favreau','animacija'),
+	('2 Hearts','2020','Lance Hool','romantika'),
+	('Forrest Gump','1994','Robert Zemeckis','drama'),
+	('Harry Potter and the Sorcerers Stone','2001','Chris Columbus','fantazija'),
+	('Deadpool','2016','Tim Miller','komedija');
+
+select * from glumac;
+
+insert into glumac (ime,prezime,drzavljanstvo)
+values
+	('Donald','Glover','amerièko'),
+	('Jacob','Elordi','australsko'),
+	('Tom','Hanks','amerièko'),
+	('Daniel','Radcliffe','britansko'),
+	('Ryan','Reynolds','amerièko,kanadsko');
+
+select * from uloga;
+
+insert into uloga (film,glumac)
+values
+	(1,1),
+	(2,2),
+	(3,3),
+	(4,4),
+	(5,5);

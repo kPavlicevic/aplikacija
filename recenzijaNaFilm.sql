@@ -82,3 +82,33 @@ values
 	(3,3),
 	(4,4),
 	(5,5);
+
+select * from korisnik;
+
+insert into korisnik (korisnickoIme,lozinka)
+values
+	('maiija','lioo234'),
+	('lucky','srca22'),
+	('inspectors','munja78'),
+	('marija49','magija743'),
+	('dominik96','hr4dt5');
+
+select * from recenzija;
+
+insert into recenzija (korisnik,film,sadrzaj)
+values
+	(1,1,'savršeno'),
+	(2,2,'dobra izvedba'),
+	(3,3,'nevjerojatan film'),
+	(4,4,'èaroban i zabavan film'),
+	(5,5,'urnebesan');
+
+select * from ocjena;
+
+insert into ocjena (korisnik,film,vrijednost)
+values
+	(1,1,'3.40'),
+	(2,2,'3.15'),
+	(3,3,'4.40'),
+	(4,4,'3.80'),
+	(5,5,'4.00');

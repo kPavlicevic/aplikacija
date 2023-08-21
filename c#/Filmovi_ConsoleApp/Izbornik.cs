@@ -14,7 +14,7 @@ namespace Filmovi_ConsoleApp
         public Izbornik() 
         { 
             ObradaFilm = new ObradaFilm(this);
-            ObradaGlumac = new ObradaGlumac();
+            ObradaGlumac = new ObradaGlumac(this);
             PrikaziIzbornik();
         }
 
@@ -31,6 +31,7 @@ namespace Filmovi_ConsoleApp
             PozdravnaPoruka();
             Console.WriteLine("Glavni izbornik");
             Console.WriteLine("1. Filmovi");
+            Console.WriteLine("2. Glumci");
 
             switch (Pomocno.ucitajBrojRaspon("Odaberi stavku izbornika: ", "Odabir mora biti 1.-4.", 1, 2 ))
             {
@@ -38,6 +39,10 @@ namespace Filmovi_ConsoleApp
                     Console.Clear();
                     ObradaFilm.PrikaziIzbornik();
                     PrikaziIzbornik();
+                    break;
+                case 2:
+                    Console.Clear();
+                    ObradaGlumac.PrikaziIzbornik();
                     break;
                
             }

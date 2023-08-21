@@ -98,10 +98,10 @@ namespace Filmovi_ConsoleApp
 
 
         
-            promjene.Sifra = Pomocno.ucitajCijeliBroj("Unesite šifru filma (" + f.Sifra +"): ", "Unos mora biti pozitivni cijeli broj!");
-            promjene.Naziv = Pomocno.ucitajString("Unesite naziv filma ("+ f.Naziv +"): ", "Unos obavezan!");
+            promjene.Sifra = Pomocno.ucitajCijeliBroj("Unesite šifru filma (" + f.Sifra + "): ", "Unos mora biti pozitivni cijeli broj!");
+            promjene.Naziv = Pomocno.ucitajString("Unesite naziv filma (" + f.Naziv + "): ", "Unos obavezan!");
             promjene.Godina = Pomocno.ucitajCijeliBroj("Unesite godinu filma (" + f.Godina + "): ", "Unos mora biti pozitivni cijeli broj!");
-            promjene.Redatelj = Pomocno.ucitajString("Unesite redatelja filma (" + f.Redatelj +"): ", "Unos obavezan!");
+            promjene.Redatelj = Pomocno.ucitajString("Unesite redatelja filma (" + f.Redatelj + "): ", "Unos obavezan!");
             promjene.Zanr = Pomocno.ucitajString("Unesite žanr filma (" + f.Zanr + "): ", "Unos obavezan!");
 
             if(Pomocno.ucitajBool("Spremi promjene? (da ili bilo što drugo za ne): ")) {

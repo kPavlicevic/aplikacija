@@ -54,6 +54,9 @@ namespace Filmovi_ConsoleApp
                     Pomocno.uspjesnaPoruka("Glumac izmjenjen!");
                     PrikaziIzbornik();
                     break;
+                case 4:
+                    Console.WriteLine("Gotov rad sa glumcima");
+                    break;
             }
         }
 

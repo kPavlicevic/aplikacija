@@ -37,7 +37,8 @@ namespace Filmovi_ConsoleApp
             {
                 case 1:
                     Console.Clear();
-                    PregledFilmova();
+                    DetaljniPregledFilmova();
+                    Console.Clear();
                     PrikaziIzbornik();
                     break;
                 case 2:
@@ -72,6 +73,94 @@ namespace Filmovi_ConsoleApp
             }
             Console.WriteLine("------------------");
 
+        }
+
+        public void DetaljniPregledFilmova()
+        {
+            PregledFilmova();
+            int index = Pomocno.ucitajBrojRaspon("Odaberite film za pregled detalja i komentara:  ", "Nije dobar odabir!", 1, Filmovi.Count());
+            Film f = Filmovi[index - 1];
+            detaljniPrikazFilma(f);
+
+        }
+
+        public void detaljniPrikazFilma(Film f) {
+            Console.Clear();
+            Console.WriteLine("------------------");
+            Console.WriteLine("----- {0} ----", f.Naziv);
+            Console.WriteLine("------------------");
+            Console.WriteLine("Godina: {0}", f.Godina);
+            Console.WriteLine("Redatelj: {0}", f.Redatelj);
+            Console.WriteLine("Žanr: {0}", f.Zanr);
+            if (f.Ocjene != null && f.Ocjene.Count > 0)
+            {
+                Console.WriteLine(f.izracunajOcjenu());
+                Console.WriteLine("Ocjena: {0}", f.izracunajOcjenu()); 
+            }
+            Console.Write("Glumci: ");
+            if (f.Glumci != null) { 
+                foreach (Glumac g in f.Glumci) {
+                    Console.Write("{0} {1}, ", g.Ime,g.Prezime);
+                }
+                Console.Write("\b\b");
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("--------- Komentari ---------");
+            if (f.Komentari != null) { 
+                foreach (Komentar k in f.Komentari) {
+                    Console.WriteLine("anonimni korisnik: {0}", k.Sadrzaj);
+                }
+            }
+
+            IzbornikDetalja(f);
+        }
+
+        public void IzbornikDetalja(Film f)
+        {
+            
+            Console.WriteLine("------------------");
+            Console.WriteLine("----- akcije -----");
+            Console.WriteLine("------------------");
+            Console.WriteLine("1. Komentiraj");
+            Console.WriteLine("2. Ocjeni");
+            Console.WriteLine("3. Povratak");
+            switch (Pomocno.ucitajBrojRaspon ("Odaberi stavku: ", "Odabir mora biti 1.-2.", 1, 3))
+            {
+                case 1:
+                    Console.Clear();
+                    KomentirajFilm(f);
+                    detaljniPrikazFilma(f);
+                    break;
+                case 2:
+                    Console.Clear();
+                    OcjeniFilm(f);
+                    detaljniPrikazFilma(f);
+                    break;
+                case 3:
+                    Console.Clear();
+                    PrikaziIzbornik();
+                    break;
+            }
+        }
+
+        private void OcjeniFilm(Film f)
+        {
+            while (Pomocno.ucitajBool("Ocjeni? (da ili bilo što za ne): "))
+            {
+                Ocjena o = new Ocjena();
+                o.Vrijednost = Pomocno.ucitajBrojRaspon("Unesite ocjenu 1-5: ", "Odabir mora biti 1-5", 1, 5);
+                f.Ocjene.Add(o);
+            }
+        }
+
+        public void KomentirajFilm(Film f) {
+            while (Pomocno.ucitajBool("Komentiraj? (da ili bilo što za ne): "))
+            {
+                Komentar k = new Komentar();
+                k.Sadrzaj = Pomocno.ucitajString("Unesite komentar: ", "Unos obavezan!");
+                f.Komentari.Add(k);
+            }
         }
 
         public void DodajNoviFilm() {
@@ -116,7 +205,7 @@ namespace Filmovi_ConsoleApp
 
         private List<Glumac> DodajGlumce() { 
             List<Glumac> glumci = new List<Glumac>();
-            while (Pomocno.ucitajBool("Želite li dodati glumca? (da ili bilo što za ne): ")) {
+            while (Pomocno.ucitajBool("Želite li dodati glumca? (da ili bilo što drugo za ne): ")) {
                 glumci.Add(OdaberiGlumca());
             }
 
@@ -148,6 +237,33 @@ namespace Filmovi_ConsoleApp
                 Godina = 2020,
                 Redatelj = "Lance Hool",
                 Zanr = "romantika"
+            });
+
+            Filmovi.Add(new Film
+            {
+                Sifra = 3,
+                Naziv = "Forrest Gump",
+                Godina = 1994,
+                Redatelj = "Robert Zemeckis",
+                Zanr = "drama"
+            });
+
+            Filmovi.Add(new Film
+            {
+                Sifra = 4,
+                Naziv = "Harry Potter and the Sorcerers Stone",
+                Godina = 2001,
+                Redatelj = "Chris Columbus",
+                Zanr = "fantazija"
+            });
+
+            Filmovi.Add(new Film
+            {
+                Sifra = 5,
+                Naziv = "Deadpool",
+                Godina = 2016,
+                Redatelj = "Tim Miller",
+                Zanr = "komedija"
             });
         }
     }

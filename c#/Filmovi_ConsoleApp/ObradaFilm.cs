@@ -24,16 +24,16 @@ namespace Filmovi_ConsoleApp
 
         public void PrikaziIzbornik()
         {
-
             Console.WriteLine("---------------------------------------");
             Console.WriteLine("----- Izbornik za rad s filmovima -----");
             Console.WriteLine("---------------------------------------");
             Console.WriteLine("1. Pregled postojećih filmova");
             Console.WriteLine("2. Unos novog filma");
             Console.WriteLine("3. Promjena postojećeg filma");
-            Console.WriteLine("4. Povratak na glavni izbornik");
+            Console.WriteLine("4. Brisanje filma");
+            Console.WriteLine("5. Povratak na glavni izbornik");
             switch (Pomocno.ucitajBrojRaspon ("Odaberite stavku izbornika filma: ", 
-                "Odabir mora biti 1.-4.", 1, 4 ))
+                "Odabir mora biti 1.-5.", 1, 5 ))
             {
                 case 1:
                     Console.Clear();
@@ -53,11 +53,24 @@ namespace Filmovi_ConsoleApp
                     Pomocno.uspjesnaPoruka("Film izmjenjen!");
                     PrikaziIzbornik();
                     break;
-                case 4:
+                case 4: 
+                    Console.Clear();
+                    BrisanjeFilma();
+                    Pomocno.uspjesnaPoruka("Film uspješno obrisan!");
+                    PrikaziIzbornik();
+                    break;
+                case 5:
                     Pomocno.uspjesnaPoruka("Gotov rad s filmovima");
                     break;
 
             }
+        }
+
+        private void BrisanjeFilma()
+        {
+            PregledFilmova();
+            int index = Pomocno.ucitajBrojRaspon("Odaberi redni broj filma: ", "Nije dobar odabir!", 1, Filmovi.Count());
+            Filmovi.RemoveAt(index - 1);
         }
 
         public void PregledFilmova()
@@ -92,10 +105,13 @@ namespace Filmovi_ConsoleApp
             Console.WriteLine("Godina: {0}", f.Godina);
             Console.WriteLine("Redatelj: {0}", f.Redatelj);
             Console.WriteLine("Žanr: {0}", f.Zanr);
+            Console.Write("Ocjena: ");
             if (f.Ocjene != null && f.Ocjene.Count > 0)
             {
                 Console.WriteLine(f.izracunajOcjenu());
-                Console.WriteLine("Ocjena: {0}", f.izracunajOcjenu()); 
+            }
+            else {
+                Console.WriteLine("Još nitko nije ocijenio!");
             }
             Console.Write("Glumci: ");
             if (f.Glumci != null) { 
@@ -109,7 +125,7 @@ namespace Filmovi_ConsoleApp
             Console.WriteLine("--------- Komentari ---------");
             if (f.Komentari != null) { 
                 foreach (Komentar k in f.Komentari) {
-                    Console.WriteLine("anonimni korisnik: {0}", k.Sadrzaj);
+                    Console.WriteLine("{0}: {1}",k.Korisnik, k.Sadrzaj);
                 }
             }
 
@@ -125,7 +141,7 @@ namespace Filmovi_ConsoleApp
             Console.WriteLine("1. Komentiraj");
             Console.WriteLine("2. Ocjeni");
             Console.WriteLine("3. Povratak");
-            switch (Pomocno.ucitajBrojRaspon ("Odaberi stavku: ", "Odabir mora biti 1.-2.", 1, 3))
+            switch (Pomocno.ucitajBrojRaspon ("Odaberi stavku: ", "Odabir mora biti 1.-3.", 1, 3))
             {
                 case 1:
                     Console.Clear();
@@ -139,7 +155,6 @@ namespace Filmovi_ConsoleApp
                     break;
                 case 3:
                     Console.Clear();
-                    PrikaziIzbornik();
                     break;
             }
         }
@@ -159,6 +174,13 @@ namespace Filmovi_ConsoleApp
             {
                 Komentar k = new Komentar();
                 k.Sadrzaj = Pomocno.ucitajString("Unesite komentar: ", "Unos obavezan!");
+                if (this.Izbornik.trenutniKorisnik != null)
+                {
+                    k.Korisnik = this.Izbornik.trenutniKorisnik.KorisnickoIme;
+                }
+                else {
+                    k.Korisnik = "gost";
+                }
                 f.Komentari.Add(k);
             }
         }

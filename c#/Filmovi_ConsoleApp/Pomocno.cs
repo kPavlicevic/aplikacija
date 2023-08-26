@@ -96,5 +96,6 @@ namespace Filmovi_ConsoleApp
             Console.WriteLine(poruka);
             Console.ForegroundColor = ConsoleColor.White;
         }
+
     }
 }

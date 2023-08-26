@@ -9,5 +9,7 @@ namespace Filmovi_ConsoleApp
     internal class Komentar
     {
         public string Sadrzaj { get; set; }
+
+        public string Korisnik { get; set; }
     }
 }

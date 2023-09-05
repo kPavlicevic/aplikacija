@@ -15,7 +15,7 @@ namespace Filmovi_ConsoleApp
         public Korisnik trenutniKorisnik { get; set; }
 
         public Izbornik() 
-        { 
+        {
             ObradaFilm = new ObradaFilm(this);
             ObradaGlumac = new ObradaGlumac(this);
             ObradaKorisnik = new ObradaKorisnik();

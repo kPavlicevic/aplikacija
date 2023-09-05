@@ -1,26 +1,31 @@
-﻿using FilmApp.Models;
+﻿using FilmRecenzijaApp.Data;
+using FilmRecenzijaApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FilmApp.Controllers
+namespace FilmRecenzijaApp.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
     public class FilmController : ControllerBase
     {
+        private readonly FilmRecenzijaContext _context;
+        public FilmController (FilmRecenzijaContext context)
+        {
+            _context = context;
+        }
+
         [HttpGet]
         public IActionResult Get ()
         {
-            var lista = new List<Film>()
-            {
-                new(){Naziv="Prvi"},
-                new(){Naziv="Drugi"}
-            };
-            return new JsonResult(lista);
+            return new JsonResult(_context.Film.ToList());
         }
 
         [HttpPost] 
         public IActionResult Post(Film film)
         {
+            _context.Film.Add(film);
+            _context.SaveChanges();
+
             return Created ("/api/v1/Film",film);
         }
 

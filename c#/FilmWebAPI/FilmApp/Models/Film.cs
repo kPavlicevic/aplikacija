@@ -1,4 +1,6 @@
-﻿namespace FilmApp.Models
+﻿
+
+namespace FilmRecenzijaApp.Models
 {
     public class Film : Entitet
     {

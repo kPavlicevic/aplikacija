@@ -103,14 +103,14 @@ namespace FilmRecenzijaApp.Controllers
                 return BadRequest();
             }
 
+            var filmBaza = _context.Film.Find(sifra);
+            if (filmBaza == null)
+            {
+                return BadRequest();
+            }
+
             try
             {
-                var filmBaza = _context.Film.Find(sifra);
-                if(filmBaza == null)
-                {
-                    return BadRequest();
-                }
-
                 _context.Film.Remove(filmBaza);
                 _context.SaveChanges();
 
@@ -118,18 +118,7 @@ namespace FilmRecenzijaApp.Controllers
             }
             catch (Exception ex)
             {
-
-                try
-                {
-                    SqlException sqle = (SqlException)ex;
-                    return StatusCode(StatusCodes.Status503ServiceUnavailable, sqle);
-                }
-                catch (Exception e)
-                {
-
-                }
-
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex);
+                return new JsonResult("{\"poruka\":\"Ne može se obrisati\"}");
             }
         }
 

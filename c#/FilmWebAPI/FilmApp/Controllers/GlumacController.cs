@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FilmRecenzijaApp.Controllers
 {
+    /// <summary>
+    /// Namijenjeno za CRUD operacije na entitetom glumac u bazi
+    /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
     public class GlumacController : ControllerBase
@@ -15,6 +18,20 @@ namespace FilmRecenzijaApp.Controllers
             _context = context;
         }
 
+
+        /// <summary>
+        /// Dohvaća sve glumce iz baze
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    GET api/v1/Glumac
+        ///
+        /// </remarks>
+        /// <returns>Glumci u bazi</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpGet]
         public IActionResult Get()
         {
@@ -48,6 +65,21 @@ namespace FilmRecenzijaApp.Controllers
             return Ok(vrati);
         }
 
+
+        /// <summary>
+        /// Dodaje glumca u bazu
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    POST api/v1/Glumac
+        ///    {Ime:"", Prezime:""}
+        ///
+        /// </remarks>
+        /// <returns>Kreirani glumac u bazi sa svim podacima</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpPost]
         public IActionResult Post(GlumacDTO dto)
         {
@@ -77,6 +109,29 @@ namespace FilmRecenzijaApp.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Mijenja podatke postojećeg glumca u bazi
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    PUT api/v1/glumac/1
+        ///
+        /// {
+        ///  "sifra": 0,
+        ///  "ime": "string",
+        ///  "prezime": "string",
+        ///  "drzavljanstvo": "string"
+        /// }
+        ///
+        /// </remarks>
+        /// <param name="sifra">Šifra glumca koji se mijenja</param>  
+        /// <returns>Svi poslani podaci od glumca</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="204">Nema u bazi glumca kojeg želimo promijeniti</response>
+        /// <response code="415">Nismo poslali JSON</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response> 
         [HttpPut]
         [Route("{sifra:int}")]
         public IActionResult Put(int sifra, GlumacDTO gdto)
@@ -110,6 +165,22 @@ namespace FilmRecenzijaApp.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Briše glumca iz baze
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    DELETE api/v1/glumac/1
+        ///    
+        /// </remarks>
+        /// <param name="sifra">Šifra glumca koji se briše</param>  
+        /// <returns>Odgovor da li je obrisano ili ne</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="204">Nema u bazi glumca kojeg želimo obrisati</response>
+        /// <response code="415">Nismo poslali JSON</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpDelete]
         [Route("{sifra:int}")]
         public IActionResult Delete(int sifra)

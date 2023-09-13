@@ -64,16 +64,16 @@ namespace Filmovi_ConsoleApp
 
         public void PregledGlumaca() {
 
-            Console.WriteLine("------------------");
-            Console.WriteLine("----- Glumci -----");
-            Console.WriteLine("------------------");
+            Console.WriteLine("---------------------------------------");
+            Console.WriteLine("--------------- Glumci ----------------");
+            Console.WriteLine("---------------------------------------");
 
             int b = 1;
             foreach (Glumac glumac in Glumci)
             {
                 Console.WriteLine("{0}. {1} {2}", b++, glumac.Ime, glumac.Prezime);
             }
-            Console.WriteLine("------------------");
+            Console.WriteLine("---------------------------------------");
 
         }
 

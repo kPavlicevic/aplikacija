@@ -6,7 +6,7 @@ using Microsoft.Data.SqlClient;
 namespace FilmRecenzijaApp.Controllers
 {
     /// <summary>
-    /// Namijenjeno za CRUD operacije na entitetom smjer u bazi
+    /// Namijenjeno za CRUD operacije na entitetom film u bazi
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
@@ -62,10 +62,10 @@ namespace FilmRecenzijaApp.Controllers
         /// Primjer upita:
         ///
         ///    POST api/v1/Film
-        ///    {ime:"", prezime:""}
+        ///    {Naziv:"", Godina:2020}
         ///
         /// </remarks>
-        /// <returns>Kreirani film u bazi s svim podacima</returns>
+        /// <returns>Kreirani film u bazi sa svim podacima</returns>
         /// <response code="200">Sve je u redu</response>
         /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
@@ -102,9 +102,10 @@ namespace FilmRecenzijaApp.Controllers
         ///
         /// {
         ///  "sifra": 0,
-        ///  "ime": "Novi ime",
-        ///  "prezime": "Novo prezime",
-        ///  "drzavljanstvo": "Drugo drzavljanstvo"
+        ///  "naziv": "string",
+        ///  "godina": 0,
+        ///  "redatelj": "string",
+        ///  "zanr": "string"
         /// }
         ///
         /// </remarks>

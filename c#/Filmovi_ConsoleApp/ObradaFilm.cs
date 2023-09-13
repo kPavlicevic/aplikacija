@@ -75,16 +75,16 @@ namespace Filmovi_ConsoleApp
 
         public void PregledFilmova()
         {
-            Console.WriteLine("------------------");
-            Console.WriteLine("----- Filmovi ----");
-            Console.WriteLine("------------------");
+            Console.WriteLine("---------------------------------------");
+            Console.WriteLine("--------------- Filmovi ---------------");
+            Console.WriteLine("---------------------------------------");
 
             int b = 1;
             foreach (Film film in Filmovi)
             {
                 Console.WriteLine("{0}. {1} ({2})", b++, film.Naziv, film.Godina);
             }
-            Console.WriteLine("------------------");
+            Console.WriteLine("---------------------------------------");
 
         }
 
@@ -99,9 +99,9 @@ namespace Filmovi_ConsoleApp
 
         public void detaljniPrikazFilma(Film f) {
             Console.Clear();
-            Console.WriteLine("------------------");
-            Console.WriteLine("----- {0} ----", f.Naziv);
-            Console.WriteLine("------------------");
+            Console.WriteLine("-----------------------------");
+            Console.WriteLine("------- {0} -------", f.Naziv);
+            Console.WriteLine("-----------------------------");
             Console.WriteLine("Godina: {0}", f.Godina);
             Console.WriteLine("Redatelj: {0}", f.Redatelj);
             Console.WriteLine("Žanr: {0}", f.Zanr);
@@ -135,9 +135,9 @@ namespace Filmovi_ConsoleApp
         public void IzbornikDetalja(Film f)
         {
             
-            Console.WriteLine("------------------");
-            Console.WriteLine("----- akcije -----");
-            Console.WriteLine("------------------");
+            Console.WriteLine("-----------------------------");
+            Console.WriteLine("---------- akcije -----------");
+            Console.WriteLine("-----------------------------");
             Console.WriteLine("1. Komentiraj");
             Console.WriteLine("2. Ocjeni");
             Console.WriteLine("3. Povratak");

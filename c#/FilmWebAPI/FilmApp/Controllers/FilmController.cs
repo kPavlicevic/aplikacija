@@ -5,6 +5,9 @@ using Microsoft.Data.SqlClient;
 
 namespace FilmRecenzijaApp.Controllers
 {
+    /// <summary>
+    /// Namijenjeno za CRUD operacije na entitetom smjer u bazi
+    /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
     public class FilmController : ControllerBase
@@ -15,6 +18,19 @@ namespace FilmRecenzijaApp.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Dohvaća sve filmove iz baze
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    GET api/v1/Film
+        ///
+        /// </remarks>
+        /// <returns>Filmovi u bazi</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpGet]
         public IActionResult Get ()
         {
@@ -38,6 +54,21 @@ namespace FilmRecenzijaApp.Controllers
 
         }
 
+
+        /// <summary>
+        /// Dodaje film u bazu
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    POST api/v1/Film
+        ///    {ime:"", prezime:""}
+        ///
+        /// </remarks>
+        /// <returns>Kreirani film u bazi s svim podacima</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpPost] 
         public IActionResult Post(Film film)
         {
@@ -60,6 +91,29 @@ namespace FilmRecenzijaApp.Controllers
 
         }
 
+
+        /// <summary>
+        /// Mijenja podatke postojećeg filma u bazi
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    PUT api/v1/film/1
+        ///
+        /// {
+        ///  "sifra": 0,
+        ///  "ime": "Novi ime",
+        ///  "prezime": "Novo prezime",
+        ///  "drzavljanstvo": "Drugo drzavljanstvo"
+        /// }
+        ///
+        /// </remarks>
+        /// <param name="sifra">Šifra filma koji se mijenja</param>  
+        /// <returns>Svi poslani podaci od filma</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="204">Nema u bazi filma kojeg želimo promijeniti</response>
+        /// <response code="415">Nismo poslali JSON</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response> 
         [HttpPut]
         [Route("{sifra:int}")]
         public IActionResult Put(int sifra, Film film) 
@@ -85,7 +139,7 @@ namespace FilmRecenzijaApp.Controllers
                 _context.Film.Update(filmBaza);
                 _context.SaveChanges();
 
-                return StatusCode(StatusCodes.Status200OK, film);
+                return StatusCode(StatusCodes.Status200OK, filmBaza);
             }
             catch (Exception ex)
             {
@@ -94,6 +148,22 @@ namespace FilmRecenzijaApp.Controllers
             
         }
 
+
+        /// <summary>
+        /// Briše film iz baze
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    DELETE api/v1/film/1
+        ///    
+        /// </remarks>
+        /// <param name="sifra">Šifra filma koji se briše</param>  
+        /// <returns>Odgovor da li je obrisano ili ne</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="204">Nema u bazi filma kojeg želimo obrisati</response>
+        /// <response code="415">Nismo poslali JSON</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpDelete]
         [Route("{sifra:int}")]
         public IActionResult Delete(int sifra)

@@ -6,8 +6,9 @@ namespace FilmRecenzijaApp.Models
     {
         public string? Naziv { get; set; }
         public int Godina { get; set; }
-        public string Redatelj { get; set; }
-        public string Zanr { get; set; }
-        public ICollection<Glumac> Glumci { get; } = new List<Glumac>();
+        public string? Redatelj { get; set; }
+        public string? Zanr { get; set; }
+        public List<Glumac> Glumci { get; set; } = new();
+        public List<Komentar> Komentari { get; set; } = new();
     }
 }

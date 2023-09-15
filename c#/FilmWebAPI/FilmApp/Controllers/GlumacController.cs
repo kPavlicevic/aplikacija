@@ -2,6 +2,7 @@
 using FilmRecenzijaApp.Models;
 using FilmRecenzijaApp.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FilmRecenzijaApp.Controllers
 {
@@ -116,7 +117,7 @@ namespace FilmRecenzijaApp.Controllers
         /// <remarks>
         /// Primjer upita:
         ///
-        ///    PUT api/v1/glumac/1
+        ///    PUT api/v1/Glumac/1
         ///
         /// {
         ///  "sifra": 0,
@@ -172,7 +173,7 @@ namespace FilmRecenzijaApp.Controllers
         /// <remarks>
         /// Primjer upita:
         ///
-        ///    DELETE api/v1/glumac/1
+        ///    DELETE api/v1/Glumac/1
         ///    
         /// </remarks>
         /// <param name="sifra">Šifra glumca koji se briše</param>  
@@ -206,6 +207,75 @@ namespace FilmRecenzijaApp.Controllers
             catch (Exception ex)
             {
                 return new JsonResult("{\"poruka\":\"Ne može se obrisati\"}");
+            }
+        }
+
+        /// <summary>
+        /// Dohvaćanje svih filmova glumca
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    GET api/v1/Glumac/1
+        ///    
+        /// </remarks>
+        /// <param name="sifra">Šifra glumca za kojeg se dohvaćaju filmovi</param>  
+        /// <returns> Sve glumce filma</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="204">Nema u bazi glumca za kojeg želimo dohvatiti filmove ili glumac ne glumi u tom filmu</response>
+        /// <response code="415">Nismo poslali JSON</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
+        [HttpGet]
+        [Route("{sifra:int}/filmovi")]
+        public IActionResult getFilmovi(int sifra)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            if (sifra <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+
+                var glumac = _context.Glumac
+                    .Include(g => g.Filmovi)
+                    .FirstOrDefault(g => g.Sifra == sifra);
+
+                if (glumac == null)
+                {
+                    return BadRequest();
+                }
+
+                if (glumac.Filmovi == null || glumac.Filmovi.Count == 0)
+                {
+                    return new EmptyResult();
+                }
+
+                List<FilmDTO> vrati = new();
+
+               vrati = glumac.Filmovi.Select(f =>
+                    new FilmDTO()
+                    {
+                        Sifra = f.Sifra,
+                        Naziv = f.Naziv,
+                        Godina = f.Godina,
+                        Redatelj = f.Redatelj,
+                        Zanr = f.Zanr,
+                    }
+                ).ToList();
+
+                return Ok(vrati);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                    ex.Message);
             }
         }
     }

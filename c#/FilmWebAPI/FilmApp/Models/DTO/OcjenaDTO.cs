@@ -1,9 +1,10 @@
 ﻿namespace FilmRecenzijaApp.Models.DTO
 {
-    public class KomentarDTO
+    public class OcjenaDTO
     {
         public int Sifra { get; set; }
         public string? Korisnik { get; set; }
-        public string? Sadrzaj { get; set; }
+        public string? Film { get; set; }
+        public int Vrijednost { get; set; }
     }
 }

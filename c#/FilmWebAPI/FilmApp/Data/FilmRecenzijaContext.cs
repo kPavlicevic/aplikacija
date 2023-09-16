@@ -15,6 +15,7 @@ namespace FilmRecenzijaApp.Data
         public DbSet<Komentar> Komentar { get; set; }
 
         public DbSet<Korisnik> Korisnik { get; set; }
+        public DbSet<Ocjena> Ocjena { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +30,9 @@ namespace FilmRecenzijaApp.Data
 
             modelBuilder.Entity<Komentar>().HasOne(k => k.Korisnik);
             modelBuilder.Entity<Komentar>().HasOne(k => k.Film);
+
+            modelBuilder.Entity<Ocjena>().HasOne(o => o.Korisnik);
+            modelBuilder.Entity<Ocjena>().HasOne(o => o.Film);
 
         }
     }

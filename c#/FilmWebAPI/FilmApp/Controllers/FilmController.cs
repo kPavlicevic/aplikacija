@@ -18,7 +18,7 @@ namespace FilmRecenzijaApp.Controllers
         private readonly FilmRecenzijaContext _context;
         private readonly ILogger<FilmController> _logger;
 
-        public FilmController (FilmRecenzijaContext context, ILogger<FilmController> logger)
+        public FilmController(FilmRecenzijaContext context, ILogger<FilmController> logger)
         {
             _context = context;
             _logger = logger;
@@ -38,38 +38,38 @@ namespace FilmRecenzijaApp.Controllers
         /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpGet]
-        public IActionResult Get ()
+        public IActionResult Get()
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-                var filmovi = _context.Film.ToList();
-                if(filmovi==null || filmovi.Count==0)
+            var filmovi = _context.Film.ToList();
+            if (filmovi == null || filmovi.Count == 0)
+            {
+                return new EmptyResult();
+            }
+
+
+            List<FilmDTO> vrati = new();
+
+            filmovi.ForEach(f =>
+            {
+                var fdto = new FilmDTO()
                 {
-                    return new EmptyResult();
-                }
+                    Sifra = f.Sifra,
+                    Naziv = f.Naziv,
+                    Godina = f.Godina,
+                    Redatelj = f.Redatelj,
+                    Zanr = f.Zanr,
+                };
 
+                vrati.Add(fdto);
 
-                List<FilmDTO> vrati = new();
+            });
 
-                filmovi.ForEach(f =>
-                {
-                    var fdto = new FilmDTO()
-                    {
-                        Sifra = f.Sifra,
-                        Naziv = f.Naziv,
-                        Godina = f.Godina,
-                        Redatelj = f.Redatelj,
-                        Zanr = f.Zanr,
-                    };
-
-                    vrati.Add(fdto);
-
-                });
-
-                return Ok(vrati);
+            return Ok(vrati);
 
         }
 
@@ -93,7 +93,7 @@ namespace FilmRecenzijaApp.Controllers
         /// <response code="200">Sve je u redu</response>
         /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
-        [HttpPost] 
+        [HttpPost]
         public IActionResult Post(FilmDTO filmdto)
         {
             if (!ModelState.IsValid)
@@ -120,7 +120,7 @@ namespace FilmRecenzijaApp.Controllers
             {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
             }
-            
+
 
         }
 
@@ -150,10 +150,10 @@ namespace FilmRecenzijaApp.Controllers
         /// <response code="503">Na azure treba dodati IP u firewall</response> 
         [HttpPut]
         [Route("{sifra:int}")]
-        public IActionResult Put(int sifra, Film film) 
+        public IActionResult Put(int sifra, Film film)
         {
 
-            if (sifra<=0 || film ==  null)
+            if (sifra <= 0 || film == null)
             {
                 return BadRequest();
             }
@@ -173,7 +173,7 @@ namespace FilmRecenzijaApp.Controllers
                 _context.Film.Update(filmBaza);
                 _context.SaveChanges();
 
-                
+
 
                 return StatusCode(StatusCodes.Status200OK, filmBaza);
             }
@@ -181,7 +181,7 @@ namespace FilmRecenzijaApp.Controllers
             {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, ex);
             }
-            
+
         }
 
 
@@ -245,13 +245,16 @@ namespace FilmRecenzijaApp.Controllers
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpGet]
         [Route("{sifra:int}/glumci")]
-        public IActionResult GetGlumci(int sifra) {
-            if (!ModelState.IsValid) {
+        public IActionResult GetGlumci(int sifra)
+        {
+            if (!ModelState.IsValid)
+            {
                 return BadRequest();
             }
-            
-            if(sifra <= 0) {
-                return BadRequest(); 
+
+            if (sifra <= 0)
+            {
+                return BadRequest();
             }
 
             try
@@ -350,7 +353,8 @@ namespace FilmRecenzijaApp.Controllers
                 {
                     film.Glumci.Add(glumac);
                 }
-                else {
+                else
+                {
                     return NoContent();
                 }
 
@@ -406,14 +410,14 @@ namespace FilmRecenzijaApp.Controllers
 
                 if (film == null)
                 {
-                    return BadRequest("Film sa predanom šifrom ne postoji");
+                    return BadRequest("Film s predanom šifrom ne postoji");
                 }
 
                 var glumac = _context.Glumac.Find(glumacSifra);
 
                 if (glumac == null)
                 {
-                    return BadRequest("Glumac sa predanom šifrom ne postoji");
+                    return BadRequest("Glumac s predanom šifrom ne postoji");
                 }
 
                 if (film.Glumci.Contains(glumac))
@@ -423,8 +427,9 @@ namespace FilmRecenzijaApp.Controllers
                     _context.SaveChanges();
                     return Ok();
                 }
-                else {
-                    return BadRequest("Glumac sa predanom šifrom se ne nalzi na ovom filmu");
+                else
+                {
+                    return BadRequest("Glumac s predanom šifrom se ne nalazi na ovom filmu");
 
                 }
             }
@@ -472,6 +477,7 @@ namespace FilmRecenzijaApp.Controllers
 
                 var film = _context.Film
                     .Include(f => f.Komentari)
+                    .ThenInclude(k=>k.Korisnik)
                     .FirstOrDefault(f => f.Sifra == sifra);
 
                 if (film == null)
@@ -491,9 +497,9 @@ namespace FilmRecenzijaApp.Controllers
                     vrati.Add(new KomentarDTO()
                     {
                         Sifra = k.Sifra,
-                        Korisnik = k.Korisnik,
+                        Korisnik = k.Korisnik.KorisnickoIme,
                         Sadrzaj = k.Sadrzaj,
-                    }) ;
+                    });
                 });
 
                 return Ok(vrati);
@@ -504,6 +510,147 @@ namespace FilmRecenzijaApp.Controllers
                 return StatusCode(StatusCodes.Status503ServiceUnavailable,
                     ex.Message);
             }
+        }
+
+
+        /// <summary>
+        /// Dodaje komentar na film
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    POST api/v1/Film/1/dodajKomentar
+        ///    {
+        ///    "sifra": 1,
+        ///     "komentarSifra" : 3
+        ///    }
+        ///
+        /// </remarks>
+        /// <returns>Kreirani film u bazi s svim podacima</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="204">Komentar već postoji na tom filmu</response>
+        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
+        [HttpPost]
+        [Route("{sifra:int}/dodaj/{komentarSifra:int}")]
+        public IActionResult DodajKomentar(int sifra, int komentarSifra)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            if (sifra <= 0 || komentarSifra <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+
+                var film = _context.Film
+                    .Include(f => f.Komentari)
+                    .FirstOrDefault(f => f.Sifra == sifra);
+
+                if (film == null)
+                {
+                    return BadRequest();
+                }
+
+                var komentar = _context.Komentar.Find(komentarSifra);
+
+                if (komentar == null)
+                {
+                    return BadRequest();
+                }
+
+                // napraviti kontrolu da li je taj polaznik već u toj grupi
+                film.Komentari.Add(komentar);
+
+                _context.Film.Update(film);
+                _context.SaveChanges();
+
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                       StatusCodes.Status503ServiceUnavailable,
+                       ex.Message);
+
+            }
+        }
+
+        /// <summary>
+        /// Briše komentar s filma
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    DELETE api/v1/film/1/obrisiKomentar/1
+        ///    
+        /// </remarks>
+        /// <param name="sifra">Šifra filma sa kojeg se briše komentar</param>  
+        /// <returns>Odgovor da li je obrisano ili ne</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="400">Film sa šifrom ne postoji u bazi ili komentar sa šifromKomentar nije na tom filmu</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
+        [HttpDelete]
+        [Route("{sifra:int}/obrisiKomentar/{komentarSifra:int}")]
+        public IActionResult DeleteKomentar(int sifra, int komentarSifra)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            if (sifra <= 0 || komentarSifra <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+
+                var film = _context.Film
+                    .Include(f => f.Komentari)
+                    .FirstOrDefault(f => f.Sifra == sifra);
+
+                if (film == null)
+                {
+                    return BadRequest("Film s predanom šifrom ne postoji");
+                }
+
+                var komentar = _context.Komentar.Find(komentarSifra);
+
+                if (komentar == null)
+                {
+                    return BadRequest("Komentar s predanom šifrom ne postoji");
+                }
+
+                if (film.Komentari.Contains(komentar))
+                {
+                    film.Komentari.Remove(komentar);
+                    _context.Film.Update(film);
+                    _context.SaveChanges();
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Komentar s predanom šifrom se ne nalazi na ovom filmu");
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                       StatusCodes.Status503ServiceUnavailable,
+                       ex.Message);
+
+            }
+
         }
     }
 }

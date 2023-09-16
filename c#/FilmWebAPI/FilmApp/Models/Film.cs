@@ -10,5 +10,6 @@ namespace FilmRecenzijaApp.Models
         public string? Zanr { get; set; }
         public List<Glumac> Glumci { get; set; } = new();
         public List<Komentar> Komentari { get; set; } = new();
+        public List<Ocjena> Ocjene { get; set; } = new();
     }
 }

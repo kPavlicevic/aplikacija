@@ -5,5 +5,6 @@
         public string? KorisnickoIme { get; set; }
         public string? Lozinka { get; set; }
         public List<Komentar> Komentari { get; set; } = new();
+        public List<Ocjena> Ocjene { get; set; } = new();
     }
 }

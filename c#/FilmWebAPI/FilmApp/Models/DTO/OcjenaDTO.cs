@@ -5,6 +5,6 @@
         public int Sifra { get; set; }
         public string? Korisnik { get; set; }
         public string? Film { get; set; }
-        public int Vrijednost { get; set; }
+        public decimal? Vrijednost { get; set; }
     }
 }

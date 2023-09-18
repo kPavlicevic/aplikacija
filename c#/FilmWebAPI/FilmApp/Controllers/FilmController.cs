@@ -150,10 +150,10 @@ namespace FilmRecenzijaApp.Controllers
         /// <response code="503">Na azure treba dodati IP u firewall</response> 
         [HttpPut]
         [Route("{sifra:int}")]
-        public IActionResult Put(int sifra, Film film)
+        public IActionResult Put(int sifra, FilmDTO fdto)
         {
 
-            if (sifra <= 0 || film == null)
+            if (sifra <= 0 || fdto == null)
             {
                 return BadRequest();
             }
@@ -165,17 +165,16 @@ namespace FilmRecenzijaApp.Controllers
                 {
                     return BadRequest();
                 }
-                filmBaza.Naziv = film.Naziv;
-                filmBaza.Godina = film.Godina;
-                filmBaza.Redatelj = film.Redatelj;
-                filmBaza.Zanr = film.Zanr;
+                filmBaza.Naziv = fdto.Naziv;
+                filmBaza.Godina = fdto.Godina;
+                filmBaza.Redatelj = fdto.Redatelj;
+                filmBaza.Zanr = fdto.Zanr;
 
                 _context.Film.Update(filmBaza);
                 _context.SaveChanges();
+                fdto.Sifra = filmBaza.Sifra;
 
-
-
-                return StatusCode(StatusCodes.Status200OK, filmBaza);
+                return StatusCode(StatusCodes.Status200OK, fdto);
             }
             catch (Exception ex)
             {
@@ -651,6 +650,143 @@ namespace FilmRecenzijaApp.Controllers
 
             }
 
+        }
+
+        /// <summary>
+        /// Dohvaćanje svih ocjena filma
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    GET api/v1/film/1/ocjene
+        ///    
+        /// </remarks>
+        /// <param name="sifra">Šifra filma za kojeg se dohvaćaju ocjene</param>  
+        /// <returns> Sve ocjene koji su ocjenjeni na filmu</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="204">Nema u bazi filma za kojeg želimo dohvatiti ocjene ili film nije ocjenjen</response>
+        /// <response code="415">Nismo poslali JSON</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
+        [HttpGet]
+        [Route("{sifra:int}/ocjene")]
+        public IActionResult GetOcjene(int sifra)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            if (sifra <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+
+                var film = _context.Film
+                    .Include(f => f.Ocjene)
+                    .ThenInclude(o=>o.Korisnik)
+                    .FirstOrDefault(f => f.Sifra == sifra);
+
+                if (film == null)
+                {
+                    return BadRequest();
+                }
+
+                if (film.Ocjene == null || film.Ocjene.Count == 0)
+                {
+                    return new EmptyResult();
+                }
+
+                List<OcjenaDTO> vrati = new();
+                film.Ocjene.ForEach(o =>
+                {
+                    vrati.Add(new OcjenaDTO()
+                    {
+                        Sifra = o.Sifra,
+                        Korisnik = o.Korisnik.KorisnickoIme,
+                        Vrijednost = o.Vrijednost,
+                    });
+                });
+
+                return Ok(vrati);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                    ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Dodaje ocjenu na film
+        /// </summary>
+        /// <remarks>
+        /// Primjer upita:
+        ///
+        ///    POST api/v1/Film/1/dodajOcjenu
+        ///    {
+        ///    "sifra": 1,
+        ///     "ocjenaSifra" : 3
+        ///    }
+        ///
+        /// </remarks>
+        /// <returns>Kreirani film u bazi sa svim podacima</returns>
+        /// <response code="200">Sve je u redu</response>
+        /// <response code="204">Ocjena već postoji na tom filmu</response>
+        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
+        [HttpPost]
+        [Route("{sifra:int}/dodaj/{ocjenaSifra:int}")]
+        public IActionResult DodajOcjenu(int sifra, int ocjenaSifra)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            if (sifra <= 0 || ocjenaSifra <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+
+                var film = _context.Film
+                    .Include(f => f.Ocjene)
+                    .FirstOrDefault(f => f.Sifra == sifra);
+
+                if (film == null)
+                {
+                    return BadRequest();
+                }
+
+                var ocjena = _context.Ocjena.Find(ocjenaSifra);
+
+                if (ocjena == null)
+                {
+                    return BadRequest();
+                }
+
+                // napraviti kontrolu da li je taj polaznik već u toj grupi
+                film.Ocjene.Add(ocjena);
+
+                _context.Film.Update(film);
+                _context.SaveChanges();
+
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                       StatusCodes.Status503ServiceUnavailable,
+                       ex.Message);
+
+            }
         }
     }
 }

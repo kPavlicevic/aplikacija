@@ -4,12 +4,12 @@ namespace FilmRecenzijaApp.Models
 {
     public class Ocjena : Entitet
     {
-        [ForeignKey ("korisnik")]
+        [ForeignKey("korisnik")]
         public Korisnik? Korisnik { get; set; }
 
         [ForeignKey("film")]
         public Film? Film { get; set; }
 
-        public int Vrijednost { get; set; }
+        public decimal? Vrijednost { get; set; }
     }
 }

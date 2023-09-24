@@ -4,6 +4,6 @@
     {
         public int Sifra { get; set; }
         public string? Korisnik { get; set; }
-        public decimal? Vrijednost { get; set; }
+        public decimal Vrijednost { get; set; }
     }
 }

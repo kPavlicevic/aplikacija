@@ -10,6 +10,6 @@ namespace FilmRecenzijaApp.Models
         [ForeignKey("film")]
         public Film? Film { get; set; }
 
-        public decimal? Vrijednost { get; set; }
+        public decimal Vrijednost { get; set; }
     }
 }

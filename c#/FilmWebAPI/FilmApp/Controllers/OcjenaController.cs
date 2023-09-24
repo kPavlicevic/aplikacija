@@ -205,7 +205,60 @@ namespace FilmRecenzijaApp.Controllers
         //hint: PUT request; ulaz: sifra ocjene, korisničko ime;
         //PAZI!!! samo korisnik koji je prvotno ostavio ocjenu može ju izmjeniti
 
-        //TODO: omogućiti dohvaćanje prosječne ocjene nekog filma
-        //hint: Get request, ulaz: šifra filma, funkcija SUM
+        /// <summary> Dohvaćanje prosječne ocjena filma</summary>
+        /// <remarks> **Primjer upita:** ``` GET api/v1/film/1/ocjeneProsjek ``` </remarks>
+        /// <param name="sifra">Šifra filma za kojeg se dohvaća prosječna ocjena</param>  
+        /// <response code="200">Prosječna ocjena filma</response>
+        /// <response code="204">Nema u bazi filma za kojeg želimo dohvatiti ocjene</response>
+        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
+        [HttpGet]
+        [Route("{sifra:int}/ocjeneProsjek")]
+        public IActionResult GetOcjeneProsjek(int sifra)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            if (sifra <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+
+                var film = _context.Film
+                    .Include(f => f.Ocjene)
+                    .ThenInclude(o => o.Korisnik)
+                    .FirstOrDefault(f => f.Sifra == sifra);
+
+                if (film == null)
+                {
+                    return NoContent();
+                }
+
+                if (film.Ocjene == null || film.Ocjene.Count == 0)
+                {
+                    return Ok(0);
+                }
+
+                decimal sum = 0;
+
+                film.Ocjene.ForEach(o =>
+                {
+                    sum += o.Vrijednost;
+                });
+
+                return Ok(sum/film.Ocjene.Count);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                    ex.Message);
+            }
+        }
     }
 }

@@ -252,7 +252,65 @@ namespace FilmRecenzijaApp.Controllers
             }
         }
 
-        //TODO: omogućiti dohvaćanje samo jednog glumca ovisno o predanoj šifri
-        //hint: GET request; ulaz: sifra glumca
+        /// <summary> Dohvaćanje glumca po šifri </summary>
+        /// <remarks>**Primjer upita:** ```GET /api/v1/Glumac/1```</remarks>
+        /// <param name="sifra">Šifra glumca za kojeg želimo dohvatiti detalje</param>
+        /// <response code="200">Objekt GlumacDetaljiDTO</response>
+        /// <response code="204">Glumac sa traženom šifrom ne postoji</response>
+        /// <response code="400">Zahtjev nije ispravan (BadRequest)</response>
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
+        [HttpGet]
+        [Route("{sifra:int}")]
+        public IActionResult getGlumacPoSifri(int sifra) {
+
+            if (!ModelState.IsValid) {
+                return BadRequest();
+            }
+
+            if (sifra <= 0) {
+                return BadRequest();
+            }
+
+            try
+            {
+                var glumac = _context.Glumac
+                    .Include(g => g.Filmovi)
+                    .FirstOrDefault(g => g.Sifra == sifra);
+
+                if (glumac == null)
+                {
+                    return NoContent();
+                }
+
+                List<FilmDTO> privFilmovi = new();
+
+                foreach(Film f in glumac.Filmovi) {
+                    privFilmovi.Add(new FilmDTO()
+                    {
+                        Sifra = f.Sifra,
+                        Naziv = f.Naziv,
+                        Godina = f.Godina,
+                        Redatelj = f.Redatelj,
+                        Zanr = f.Zanr
+                    });
+                }
+
+                GlumacDetaljiDTO vrati = new GlumacDetaljiDTO()
+                {
+                    Sifra = glumac.Sifra,
+                    Ime = glumac.Ime,
+                    Prezime = glumac.Prezime,
+                    Drzavljanstvo = glumac.Drzavljanstvo,
+                    Filmovi = privFilmovi,
+                };
+
+                return Ok(vrati);
+            }
+            catch (Exception ex) {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                   ex.Message);
+            }
+
+        }
     }
 }

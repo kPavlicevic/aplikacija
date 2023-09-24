@@ -395,8 +395,94 @@ namespace FilmRecenzijaApp.Controllers
 
         }
 
-        //TODO: omogućiti dohvaćanje samo jednog filma ovisno o predanoj šifri
-        //hint: GET request; ulaz: šifra filma
+        /// <summary>Dohvaćanje filma po sifri</summary>
+        /// <remarks>**Primjer upita:** ```GET api/v1/film/1```</remarks>
+        /// <param name="sifra"></param>
+        /// <response code="200">Objekt filma</response>
+        /// <response code="204">Film sa predanom šifrom ne postoji</response>
+        /// <response code="400">Zahtjev nije ispravan (BadRequest)</response>
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
+        [HttpGet]
+        [Route("{sifra:int}")]
+        public IActionResult GetFilmPoSifri(int sifra) {
+
+            if (!ModelState.IsValid) {
+                return BadRequest();
+            }
+
+            if (sifra <= 0) {
+                return BadRequest();
+            }
+
+            try
+            {
+                var film = _context.Film
+                        .Include(f => f.Glumci)
+                        .Include(f => f.Komentari).ThenInclude(komentar => komentar.Korisnik)
+                        .Include(f => f.Ocjene).ThenInclude(ocjena => ocjena.Korisnik)
+                        .FirstOrDefault(f => f.Sifra == sifra);
+
+                if (film == null)
+                {
+                    return NoContent();
+                }
+
+                List<GlumacDTO> privGlumci = new();
+                List<KomentarDTO> privKomentari = new();
+                List<OcjenaDTO> privOcjene = new();
+
+
+                foreach (Glumac g in film.Glumci)
+                {
+                    privGlumci.Add(new GlumacDTO()
+                    {
+                        Sifra = g.Sifra,
+                        Ime = g.Ime,
+                        Prezime = g.Prezime,
+                        Drzavljanstvo = g.Drzavljanstvo
+                    });
+                }
+
+                foreach (Komentar k in film.Komentari)
+                {
+                    privKomentari.Add(new KomentarDTO()
+                    {
+                        Sifra = k.Sifra,
+                        Korisnik = k.Korisnik.KorisnickoIme,
+                        Sadrzaj = k.Sadrzaj,
+                    });
+                }
+
+                foreach (Ocjena o in film.Ocjene)
+                {
+                    privOcjene.Add(new OcjenaDTO()
+                    {
+                        Sifra = o.Sifra,
+                        Korisnik = o.Korisnik.KorisnickoIme,
+                        Vrijednost = o.Vrijednost
+                    });
+                }
+
+                FilmDetaljiDTO vrati = new FilmDetaljiDTO()
+                {
+                    Sifra = film.Sifra,
+                    Naziv = film.Naziv,
+                    Godina = film.Godina,
+                    Redatelj = film.Redatelj,
+                    Zanr = film.Zanr,
+                    Glumci = privGlumci,
+                    Komentari = privKomentari,
+                    Ocjene = privOcjene,
+                };
+
+                return Ok(vrati);
+
+            }catch (Exception ex){
+                return StatusCode(
+                       StatusCodes.Status503ServiceUnavailable,
+                       ex.Message);
+            }
+        }
     }
 }
 

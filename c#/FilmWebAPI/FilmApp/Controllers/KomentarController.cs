@@ -4,6 +4,7 @@ using FilmRecenzijaApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.Logging;
 
 namespace FilmRecenzijaApp.Controllers
 {
@@ -15,9 +16,11 @@ namespace FilmRecenzijaApp.Controllers
     public class KomentarController : ControllerBase
     {
         private readonly FilmRecenzijaContext _context;
-        public KomentarController(FilmRecenzijaContext context)
+        private readonly ILogger<KomentarController> _logger;
+        public KomentarController(FilmRecenzijaContext context, ILogger<KomentarController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
 
@@ -197,8 +200,64 @@ namespace FilmRecenzijaApp.Controllers
 
         }
 
-        //TODO: omogućiti izmjenu postojećeg komentara
-        //hint: PUT request
-        //PAZI !!! samo korisnik koji je kreirao komentar može ga ažurirati
+        /// <summary>Izmjeni sadržaj komentara</summary>
+        /// <remarks>
+        /// **Primjer upita:** 
+        /// ```
+        /// {
+        ///     "sifra":1,
+        ///     "korisnik":"dominik96",
+        ///     "sadrzaj":"proizvoljni tekst"
+        /// }
+        /// ```
+        /// </remarks>
+        /// <param name="sifra">Sifra komentara koji se želi izmjeni</param>
+        /// <param name="komentarDTO">Komentar uspješno izmjenjen</param>
+        /// <response code="200">Izmjenjeni komentar</response>
+        /// <response code="204">Ne postoji komentar s traženom šifrom</response>
+        /// <response code="400">Zahtjev nije valjan (BadRequest)</response>
+        /// <response code="401">Nemate pravo na ovu radnju</response>
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
+        [HttpPut]
+        [Route("{sifra:int}")]
+        public IActionResult Put(int sifra, KomentarDTO komentarDTO)
+        {
+
+            if (!ModelState.IsValid) {
+                return BadRequest();
+            }
+
+            if (sifra <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                var komentar = _context.Komentar.
+                     Include(komentar => komentar.Korisnik)
+                    .FirstOrDefault(komentar => komentar.Sifra == sifra);
+
+
+                if (komentar.Korisnik.KorisnickoIme == komentarDTO.Korisnik) {
+                    komentar.Sadrzaj = komentarDTO.Sadrzaj;
+                    _context.Komentar.Update(komentar);
+                    _context.SaveChanges();
+                    return Ok();
+                }
+                else {
+                    return Unauthorized("Samo korsinik koji je kreirao komentar ga može izmjeniti");
+                }
+
+
+            }
+            catch (Exception ex) {
+                return StatusCode(
+                    StatusCodes.Status503ServiceUnavailable,
+                    ex.Message
+                );
+            }
+        }
+
     }
 }

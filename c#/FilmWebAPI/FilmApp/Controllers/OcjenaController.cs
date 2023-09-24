@@ -127,10 +127,12 @@ namespace FilmRecenzijaApp.Controllers
                     return NoContent();
                 }
 
+                foreach (Ocjena o in film.Ocjene) {
+                    if (o.Korisnik == korisnik) {
+                        return NoContent();
+                    }
+                }
 
-                //TODO: ako je korisnik već ostavio ocjenu vratiti NoContent
-                //jer ne želimo da korisnik može ostaviti više ocjena kako bi sabotirao
-                //prosječnu ocjenu fillma
                 Ocjena novaOcjena = new Ocjena()
                 {
                     Film = film,

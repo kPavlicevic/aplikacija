@@ -68,7 +68,6 @@ namespace FilmRecenzijaApp.Controllers
                         Sifra = o.Sifra,
                         Korisnik = o.Korisnik.KorisnickoIme,
                         Vrijednost = o.Vrijednost,
-                        Film = o.Film.Naziv,
                     });
                 });
 

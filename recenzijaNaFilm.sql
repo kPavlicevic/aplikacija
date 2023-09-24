@@ -45,12 +45,12 @@ create table ocjena(
 	vrijednost decimal (3,2)
 );
 
-alter table uloga add foreign key (film) references film(sifra);
-alter table uloga add foreign key (glumac) references glumac(sifra);
-alter table recenzija add foreign key (korisnik) references korisnik(sifra);
-alter table recenzija add foreign key (film) references film(sifra);
-alter table ocjena add foreign key (korisnik) references korisnik(sifra);
-alter table ocjena add foreign key (film) references film(sifra);
+alter table uloga add foreign key (film) references film(sifra) on delete cascade;
+alter table uloga add foreign key (glumac) references glumac(sifra) on delete cascade;
+alter table recenzija add foreign key (korisnik) references korisnik(sifra) on delete cascade;
+alter table recenzija add foreign key (film) references film(sifra) on delete cascade;
+alter table ocjena add foreign key (korisnik) references korisnik(sifra) on delete cascade;
+alter table ocjena add foreign key (film) references film(sifra) on delete cascade;
 
 
  select * from film;

@@ -20,20 +20,12 @@ namespace FilmRecenzijaApp.Controllers
         }
 
 
-        /// <summary>
-        /// Dohvaćanje svih ocjena filma
-        /// </summary>
-        /// <remarks>
-        /// Primjer upita:
-        ///
-        ///    GET api/v1/film/1/ocjene
-        ///    
-        /// </remarks>
+        /// <summary> Dohvaćanje svih ocjena filma</summary>
+        /// <remarks> **Primjer upita:** ``` GET api/v1/film/1/ocjene ``` </remarks>
         /// <param name="sifra">Šifra filma za kojeg se dohvaćaju ocjene</param>  
-        /// <returns> Sve ocjene koji su ocjenjeni na filmu</returns>
-        /// <response code="200">Sve je u redu</response>
+        /// <response code="200">Lista ocjena ostavljenih na traženi film</response>
         /// <response code="204">Nema u bazi filma za kojeg želimo dohvatiti ocjene ili film nije ocjenjen</response>
-        /// <response code="415">Nismo poslali JSON</response> 
+        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpGet]
         [Route("{sifra:int}/ocjene")]
@@ -59,12 +51,12 @@ namespace FilmRecenzijaApp.Controllers
 
                 if (film == null)
                 {
-                    return BadRequest();
+                    return NoContent();
                 }
 
                 if (film.Ocjene == null || film.Ocjene.Count == 0)
                 {
-                    return new EmptyResult();
+                    return NoContent();
                 }
 
                 List<OcjenaDTO> vrati = new();
@@ -76,6 +68,7 @@ namespace FilmRecenzijaApp.Controllers
                         Sifra = o.Sifra,
                         Korisnik = o.Korisnik.KorisnickoIme,
                         Vrijednost = o.Vrijednost,
+                        Film = o.Film.Naziv,
                     });
                 });
 
@@ -89,21 +82,21 @@ namespace FilmRecenzijaApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Dodaje ocjenu na film
-        /// </summary>
+        /// <summary >Dodaje ocjenu na film </summary>
         /// <remarks>
-        /// Primjer upita:
-        ///
+        /// **Primjer upita:**
+        ///```
         ///    POST api/v1/Film/1/dodajOcjenu
         ///    {
-        ///    "sifra": 1,
+        ///     "korisnik" : "dominik96",
+        ///     "vrijednost": 5
         ///    }
-        ///
+        ///```
         /// </remarks>
-        /// <returns>Kreirani film u bazi sa svim podacima</returns>
-        /// <response code="200">Sve je u redu</response>
-        /// <response code="204">Ocjena već postoji na tom filmu</response>
+        /// <param name="sifra">šifra filma koji se ocjenjuje</param>
+        /// <param name="ocjenaDTO">Korisničko ime i ocjena filma</param>
+        /// <response code="200">Ocjena uspješno dodana</response>
+        /// <response code="204">Film ne postoji ili je korisnik već ocijenio ovaj film</response>
         /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpPost]
@@ -132,12 +125,13 @@ namespace FilmRecenzijaApp.Controllers
 
                 if (film == null || korisnik == null)
                 {
-                    return BadRequest();
+                    return NoContent();
                 }
 
 
-                //TODO: dodati ocjenu na taj film, odnosno
-                //insertatnt novu ocjenu i povezat ga na postojeći film
+                //TODO: ako je korisnik već ostavio ocjenu vratiti NoContent
+                //jer ne želimo da korisnik može ostaviti više ocjena kako bi sabotirao
+                //prosječnu ocjenu fillma
                 Ocjena novaOcjena = new Ocjena()
                 {
                     Film = film,
@@ -162,19 +156,12 @@ namespace FilmRecenzijaApp.Controllers
 
 
 
-        /// <summary>
-        /// Briše ocjenu s filma
-        /// </summary>
-        /// <remarks>
-        /// Primjer upita:
-        ///
-        ///    DELETE api/v1/film/1/obrisiOcjenu/1
-        ///    
-        /// </remarks>
-        /// <param name="sifra">Šifra filma s kojeg se briše ocjena</param>  
-        /// <returns>Odgovor da li je obrisano ili ne</returns>
-        /// <response code="200">Sve je u redu</response>
-        /// <response code="400">Film sa šifrom ne postoji u bazi ili ocjena sa šifromOcjena nije na tom filmu</response> 
+        /// <summary>Briše ocjenu s filma </summary>
+        /// <remarks> **Primjer upita:** ``` DELETE api/v1/film/1/obrisiOcjenu/1 ``` </remarks>
+        /// <param name="ocjenaSifra">Šifra ocjene koja se želi ukloniti</param>  
+        /// <response code="200">Ocjena uspješno uklonjena</response>
+        /// <response code="204">Film sa šifrom ne postoji u bazi ili ocjena sa šifromOcjena nije na tom filmu</response> 
+        /// <response code="400">Zahtjev nije isprava (BadRequest)</response>
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpDelete]
         [Route("/obrisiOcjenu")]
@@ -198,7 +185,7 @@ namespace FilmRecenzijaApp.Controllers
 
                 if (ocjena == null)
                 {
-                    return BadRequest("Ocjena s predanom šifrom ne postoji");
+                    return NoContent();
                 }
 
                 _context.Ocjena.Remove(ocjena);
@@ -214,5 +201,12 @@ namespace FilmRecenzijaApp.Controllers
             }
 
         }
+
+        //TODO: omogućiti izmjenu prijašnje ostavljene ocjene
+        //hint: PUT request; ulaz: sifra ocjene, korisničko ime;
+        //PAZI!!! samo korisnik koji je prvotno ostavio ocjenu može ju izmjeniti
+
+        //TODO: omogućiti dohvaćanje prosječne ocjene nekog filma
+        //hint: Get request, ulaz: šifra filma, funkcija SUM
     }
 }

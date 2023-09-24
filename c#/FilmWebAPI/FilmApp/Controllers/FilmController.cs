@@ -24,18 +24,11 @@ namespace FilmRecenzijaApp.Controllers
             _logger = logger;
         }
 
-        /// <summary>
-        /// Dohvaća sve filmove iz baze
-        /// </summary>
-        /// <remarks>
-        /// Primjer upita:
-        ///
-        ///    GET api/v1/Film
-        ///
-        /// </remarks>
-        /// <returns>Filmovi u bazi</returns>
-        /// <response code="200">Sve je u redu</response>
-        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
+        /// <summary>Dohvaća sve filmove iz baze</summary>
+        /// <remarks> **Primjer upita:** ```GET api/v1/Film``` </remarks>
+        /// <response code="200"> Lista filmova </response>
+        /// <response code="204"> Ne postoji niti jedan film </response>
+        /// <response code="400"> Zahtjev nije valjan (BadRequest) </response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpGet]
         public IActionResult Get()
@@ -48,7 +41,7 @@ namespace FilmRecenzijaApp.Controllers
             var filmovi = _context.Film.ToList();
             if (filmovi == null || filmovi.Count == 0)
             {
-                return new EmptyResult();
+                return NoContent();
             }
 
 
@@ -74,23 +67,20 @@ namespace FilmRecenzijaApp.Controllers
         }
 
 
-        /// <summary>
-        /// Dodaje film u bazu
-        /// </summary>
+        /// <summary>Dodaje film u bazu</summary>
         /// <remarks>
-        /// Primjer upita:
-        ///
-        ///    POST api/v1/Film
-        ///    {
-        ///    "naziv": "string",
-        ///    "godina": 0,
-        ///    "redatelj": "string",
-        ///    "zanr": "string",
-        ///    }
-        ///
+        ///**Primjer upita:** 
+        ///```
+        ///POST api/v1/Film 
+        ///{
+        /// "naziv": "string",
+        /// "godina": 0,
+        /// "redatelj": "string",
+        /// "zanr": "string",
+        ///}
+        ///```
         /// </remarks>
-        /// <returns>Kreirani film u bazi sa svim podacima</returns>
-        /// <response code="200">Sve je u redu</response>
+        /// <response code="200">Kreirani film</response>
         /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpPost]
@@ -125,28 +115,23 @@ namespace FilmRecenzijaApp.Controllers
         }
 
 
-        /// <summary>
-        /// Mijenja podatke postojećeg filma u bazi
-        /// </summary>
+        /// <summary>Izmjeni podatke postojećeg filma u bazi</summary>
         /// <remarks>
-        /// Primjer upita:
-        ///
-        ///    PUT api/v1/film/1
-        ///
-        /// {
-        ///  "sifra": 0,
-        ///  "naziv": "string",
-        ///  "godina": 0,
-        ///  "redatelj": "string",
-        ///  "zanr": "string"
-        /// }
-        ///
+        /// **Primjer upita:** 
+        ///```
+        ///PUT api/v1/film/1
+        ///{
+        /// "naziv": "string",
+        /// "godina": 0,
+        /// "redatelj": "string",
+        /// "zanr": "string"
+        ///}
+        ///```
         /// </remarks>
         /// <param name="sifra">Šifra filma koji se mijenja</param>  
-        /// <returns>Svi poslani podaci od filma</returns>
-        /// <response code="200">Sve je u redu</response>
+        /// <response code="200">Objekt izmjenjenog filma</response>
         /// <response code="204">Nema u bazi filma kojeg želimo promijeniti</response>
-        /// <response code="415">Nismo poslali JSON</response> 
+        /// <response code="400">Zahtjev nije valjan(BadRequest)</response>
         /// <response code="503">Na azure treba dodati IP u firewall</response> 
         [HttpPut]
         [Route("{sifra:int}")]
@@ -163,7 +148,7 @@ namespace FilmRecenzijaApp.Controllers
                 var filmBaza = _context.Film.Find(sifra);
                 if (filmBaza == null)
                 {
-                    return BadRequest();
+                    return NoContent();
                 }
                 filmBaza.Naziv = fdto.Naziv;
                 filmBaza.Godina = fdto.Godina;
@@ -184,20 +169,12 @@ namespace FilmRecenzijaApp.Controllers
         }
 
 
-        /// <summary>
-        /// Briše film iz baze
-        /// </summary>
-        /// <remarks>
-        /// Primjer upita:
-        ///
-        ///    DELETE api/v1/film/1
-        ///    
-        /// </remarks>
+        /// <summary> Briše film iz baze </summary>
+        /// <remarks> **Primjer upita:** ``` DELETE api/v1/film/1 ``` </remarks>
         /// <param name="sifra">Šifra filma koji se briše</param>  
-        /// <returns>Odgovor da li je obrisano ili ne</returns>
-        /// <response code="200">Sve je u redu</response>
+        /// <response code="200">Film uspješno obrisan</response>
         /// <response code="204">Nema u bazi filma kojeg želimo obrisati</response>
-        /// <response code="415">Nismo poslali JSON</response> 
+        /// <response code="400">Zahtjev nije valjan(BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpDelete]
         [Route("{sifra:int}")]
@@ -211,7 +188,7 @@ namespace FilmRecenzijaApp.Controllers
             var filmBaza = _context.Film.Find(sifra);
             if (filmBaza == null)
             {
-                return BadRequest();
+                return NoContent();
             }
 
             try
@@ -227,20 +204,12 @@ namespace FilmRecenzijaApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Dohvaćanje svih glumaca filma
-        /// </summary>
-        /// <remarks>
-        /// Primjer upita:
-        ///
-        ///    GET api/v1/film/1
-        ///    
-        /// </remarks>
+        /// <summary> Dohvaćanje svih glumaca filma </summary>
+        /// <remarks> **Primjer upita:** ```GET api/v1/film/1``` </remarks>
         /// <param name="sifra">Šifra filma za kojeg se dohvaćaju glumci</param>  
-        /// <returns> Sve glumce filma</returns>
-        /// <response code="200">Sve je u redu</response>
+        /// <response code="200">Lista glumaca traženog filma</response>
         /// <response code="204">Nema u bazi filma za kojeg želimo dohvatiti glumce ili film nema glumaca</response>
-        /// <response code="415">Nismo poslali JSON</response> 
+        /// <response code="400">Zahtjev nije valjan(BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpGet]
         [Route("{sifra:int}/glumci")]
@@ -270,7 +239,7 @@ namespace FilmRecenzijaApp.Controllers
 
                 if (film.Glumci == null || film.Glumci.Count == 0)
                 {
-                    return new EmptyResult();
+                    return NoContent();
                 }
 
                 List<GlumacDTO> vrati = new();
@@ -296,21 +265,11 @@ namespace FilmRecenzijaApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Dodaje glumca na film
-        /// </summary>
-        /// <remarks>
-        /// Primjer upita:
-        ///
-        ///    POST api/v1/Film/1/dodajGlumca
-        ///    {
-        ///    "sifra": 1,
-        ///     "glumacSifra" : 3
-        ///    }
-        ///
-        /// </remarks>
-        /// <returns>Kreirani film u bazi sa svim podacima</returns>
-        /// <response code="200">Sve je u redu</response>
+        /// <summary> Dodaje glumca na film </summary>
+        /// <remarks> **Primjer upita:** ``` POST api/v1/Film/1/dodajGlumca/3 ``` </remarks>
+        /// <param name="sifra">Šifra filma na kojeg se dodaje glumac</param>  
+        /// <param name="glumacSifra">Šifra glumca koji se dodaje</param>  
+        /// <response code="200">Glumac uspješno dodan na film</response>
         /// <response code="204">Glumac već postoji na tom filmu</response>
         /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
@@ -347,7 +306,7 @@ namespace FilmRecenzijaApp.Controllers
                     return BadRequest();
                 }
 
-                // napraviti kontrolu da li je taj polaznik već u toj grupi
+                // kontrola da li je taj glumac već u tom filmu
                 if (!film.Glumci.Contains(glumac))
                 {
                     film.Glumci.Add(glumac);
@@ -371,19 +330,13 @@ namespace FilmRecenzijaApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Briše glumca s filma
-        /// </summary>
-        /// <remarks>
-        /// Primjer upita:
-        ///
-        ///    DELETE api/v1/film/1/obrisiGlumca/1
-        ///    
-        /// </remarks>
+        /// <summary> Briše glumca s filma </summary>
+        /// <remarks> **Primjer upita:** ``` DELETE api/v1/film/1/obrisiGlumca/1 ``` </remarks>
         /// <param name="sifra">Šifra filma sa kojeg se briše glumac</param>  
-        /// <returns>Odgovor da li je obrisano ili ne</returns>
-        /// <response code="200">Sve je u redu</response>
-        /// <response code="400">Film sa šifrom ne postoji u bazi ili glumac sa šifromGlumac nije na tom filmu</response> 
+        /// <param name="glumacSifra">Šifra glumca koji se želi obrisati sa filma</param>  
+        /// <response code="200">Glumac uspješno obrisan</response>
+        /// <response code="204">Film sa šifrom ne postoji u bazi ili glumac sa šifromGlumac nije na tom filmu</response> 
+        /// <response code="400">Zahvjet nije valjan (BadRequest)</response>
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpDelete]
         [Route("{sifra:int}/obrisiGlumca/{glumacSifra:int}")]
@@ -416,7 +369,7 @@ namespace FilmRecenzijaApp.Controllers
 
                 if (glumac == null)
                 {
-                    return BadRequest("Glumac s predanom šifrom ne postoji");
+                    return NoContent();
                 }
 
                 if (film.Glumci.Contains(glumac))
@@ -428,7 +381,7 @@ namespace FilmRecenzijaApp.Controllers
                 }
                 else
                 {
-                    return BadRequest("Glumac s predanom šifrom se ne nalazi na ovom filmu");
+                    return NoContent();
 
                 }
             }
@@ -441,6 +394,9 @@ namespace FilmRecenzijaApp.Controllers
             }
 
         }
+
+        //TODO: omogućiti dohvaćanje samo jednog filma ovisno o predanoj šifri
+        //hint: GET request; ulaz: šifra filma
     }
 }
 

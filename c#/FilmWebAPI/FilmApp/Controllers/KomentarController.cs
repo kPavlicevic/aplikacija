@@ -3,6 +3,7 @@ using FilmRecenzijaApp.Models.DTO;
 using FilmRecenzijaApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FilmRecenzijaApp.Controllers
 {
@@ -20,20 +21,12 @@ namespace FilmRecenzijaApp.Controllers
         }
 
 
-        /// <summary>
-        /// Dohvaćanje svih komentara filma
-        /// </summary>
-        /// <remarks>
-        /// Primjer upita:
-        ///
-        ///    GET api/v1/film/1/komentari
-        ///    
-        /// </remarks>
+        /// <summary> Dohvaćanje svih komentara filma</summary>
+        /// <remarks> **Primjer upita:** ```GET api/v1/film/1/komentari``` </remarks>
         /// <param name="sifra">Šifra filma za kojeg se dohvaćaju komentari</param>  
-        /// <returns> Sve komentare koji su komentirani na filmu</returns>
-        /// <response code="200">Sve je u redu</response>
+        /// <response code="200">Lista komentara ostavljenih na film</response>
         /// <response code="204">Nema u bazi filma za kojeg želimo dohvatiti komentare ili film nema komentara</response>
-        /// <response code="415">Nismo poslali JSON</response> 
+        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpGet]
         [Route("{sifra:int}/komentari")]
@@ -59,12 +52,12 @@ namespace FilmRecenzijaApp.Controllers
 
                 if (film == null)
                 {
-                    return BadRequest();
+                    return NoContent();
                 }
 
                 if (film.Komentari == null || film.Komentari.Count == 0)
                 {
-                    return new EmptyResult();
+                    return NoContent();
                 }
 
                 List<KomentarDTO> vrati = new();
@@ -90,21 +83,21 @@ namespace FilmRecenzijaApp.Controllers
         }
 
 
-        /// <summary>
-        /// Dodaje komentar na film
-        /// </summary>
+        /// <summary> Dodaje komentar na film </summary>
         /// <remarks>
-        /// Primjer upita:
-        ///
-        ///    POST api/v1/Film/1/dodajKomentar
-        ///    {
-        ///    "sifra": 1,
-        ///    }
-        ///
+        /// **Primjer upita:**
+        ///```
+        ///POST api/v1/Film/1/dodajKomentar
+        ///{
+        /// "korisnik" : 1,
+        /// "sadržaj" : "proizvoljni tekst komentara"
+        /// }
+        /// ```
         /// </remarks>
-        /// <returns>Kreirani film u bazi sa svim podacima</returns>
-        /// <response code="200">Sve je u redu</response>
-        /// <response code="204">Komentar već postoji na tom filmu</response>
+        /// <param name="sifra"> Šifra filma koji se želi komentirati</param>
+        ///  <param name="komentarDTO"> Objekt sa korisničkim imenom i sadržajem komentara</param>
+        /// <response code="200">Komentar usješno dodan</response>
+        /// <response code="204">Film ili korisnik ne postoji</response>
         /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpPost]
@@ -133,12 +126,9 @@ namespace FilmRecenzijaApp.Controllers
 
                 if (film == null || korisnik == null)
                 {
-                    return BadRequest();
+                    return NoContent();
                 }
 
-
-                //TODO: dodati komentar na taj film, odnosno
-                //insertatnt novi komentar i povezat ga na postojeći film
                 Komentar noviKomentar = new Komentar()
                 {
                     Film = film,
@@ -161,19 +151,12 @@ namespace FilmRecenzijaApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Briše komentar s filma
-        /// </summary>
-        /// <remarks>
-        /// Primjer upita:
-        ///
-        ///    DELETE api/v1/film/1/obrisiKomentar/1
-        ///    
-        /// </remarks>
-        /// <param name="sifra">Šifra filma s kojeg se briše komentar</param>  
-        /// <returns>Odgovor da li je obrisano ili ne</returns>
-        /// <response code="200">Sve je u redu</response>
-        /// <response code="400">Film sa šifrom ne postoji u bazi ili komentar sa šifromKomentar nije na tom filmu</response> 
+        /// <summary> Briše komentar s filma </summary>
+        /// <remarks> **Primjer upita:** ``` DELETE api/v1/film/1/obrisiKomentar/1 ``` </remarks>
+        /// <param name="komentarSifra">Šifra komentara koji se želi obrisati</param>  
+        /// <response code="200">Komentar uspješno obrisan</response>
+        /// <response code="204">Komentar sa predanom šifrom ne postoji</response>
+        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpDelete]
         [Route("/obrisiKomentar")]
@@ -197,7 +180,7 @@ namespace FilmRecenzijaApp.Controllers
 
                 if (komentar == null)
                 {
-                    return BadRequest("Komentar s predanom šifrom ne postoji");
+                    return NoContent();
                 }
 
                 _context.Komentar.Remove(komentar);
@@ -213,5 +196,9 @@ namespace FilmRecenzijaApp.Controllers
             }
 
         }
+
+        //TODO: omogućiti izmjenu postojećeg komentara
+        //hint: PUT request
+        //PAZI !!! samo korisnik koji je kreirao komentar može ga ažurirati
     }
 }

@@ -203,6 +203,71 @@ namespace FilmRecenzijaApp.Controllers
 
         }
 
+
+        /// <summary>Izmjeni vrijednost ocjene</summary>
+        /// <remarks>
+        /// **Primjer upita:** 
+        /// ```
+        /// {
+        ///     "sifra":1,
+        ///     "korisnik":"dominik96",
+        ///     "vrijednost": 4.7
+        /// }
+        /// ```
+        /// </remarks>
+        /// <param name="sifra">Sifra ocjene koji se želi izmjeniti</param>
+        /// <param name="ocjenaDTO">Ocjena uspješno izmjenjena</param>
+        /// <response code="200">Izmjenjena ocjena</response>
+        /// <response code="204">Ne postoji ocjena s traženom šifrom</response>
+        /// <response code="400">Zahtjev nije valjan (BadRequest)</response>
+        /// <response code="401">Nemate pravo na ovu radnju</response>
+        /// <response code="503">Na azure treba dodati IP u firewall</response>
+        [HttpPut]
+        [Route("{sifra:int}")]
+        public IActionResult Put(int sifra, OcjenaDTO ocjenaDTO)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            if (sifra <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                var ocjena = _context.Ocjena
+                    .Include(ocjena => ocjena.Korisnik)
+                    .FirstOrDefault(ocjena => ocjena.Sifra == sifra);
+
+
+                if (ocjena.Korisnik.KorisnickoIme == ocjenaDTO.Korisnik)
+                {
+                    ocjena.Vrijednost = ocjenaDTO.Vrijednost;
+                    _context.Ocjena.Update(ocjena);
+                    _context.SaveChanges();
+                    return Ok();
+                }
+                else
+                {
+                    return Unauthorized("Samo korsinik koji je ostavio ocjenu je može izmjeniti");
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status503ServiceUnavailable,
+                    ex.Message
+                );
+            }
+        }
+
+
         //TODO: omogućiti izmjenu prijašnje ostavljene ocjene
         //hint: PUT request; ulaz: sifra ocjene, korisničko ime;
         //PAZI!!! samo korisnik koji je prvotno ostavio ocjenu može ju izmjeniti

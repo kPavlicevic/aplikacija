@@ -211,7 +211,7 @@ namespace FilmRecenzijaApp.Controllers
         /// }
         /// ```
         /// </remarks>
-        /// <param name="sifra">Sifra komentara koji se želi izmjeni</param>
+        /// <param name="sifra">Sifra komentara koji se želi izmjeniti</param>
         /// <param name="komentarDTO">Komentar uspješno izmjenjen</param>
         /// <response code="200">Izmjenjeni komentar</response>
         /// <response code="204">Ne postoji komentar s traženom šifrom</response>
@@ -234,8 +234,8 @@ namespace FilmRecenzijaApp.Controllers
 
             try
             {
-                var komentar = _context.Komentar.
-                     Include(komentar => komentar.Korisnik)
+                var komentar = _context.Komentar
+                    .Include(komentar => komentar.Korisnik)
                     .FirstOrDefault(komentar => komentar.Sifra == sifra);
 
 

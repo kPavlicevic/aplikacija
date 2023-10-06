@@ -43,8 +43,8 @@ builder.Services.AddDbContext<FilmRecenzijaContext> (o =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger(opcije =>
     {
         opcije.SerializeAsV2 = true;
@@ -53,10 +53,17 @@ if (app.Environment.IsDevelopment())
     {
         opcije.ConfigObject.AdditionalItems.Add("requestSnippetsEnabled", true);
     });
-}
+//}
 
 app.UseHttpsRedirection();
 
 app.MapControllers();
+app.UseStaticFiles();
+
+app.UseCors("CorsPolicy");
+
+app.UseDefaultFiles();
+app.UseDeveloperExceptionPage();
+app.MapFallbackToFile("index.html");
 
 app.Run();

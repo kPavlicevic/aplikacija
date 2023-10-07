@@ -1,27 +1,20 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import HomePage from './pages/HomePage';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Izbornik from './components/izbornik.component';
+import Pocetna from './components/pocetna.component';
+import Filmovi from './components/film/filmovi.component';
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Kata's Movie Database
-        </p>
-        <a
-          className="App-link"
-          href="https://imdb.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Enter
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Izbornik />
+      <Routes>
+        <Route path='/' element={<Pocetna />} />
+        <Route path='/filmovi' element={<Filmovi />} />
+      </Routes>
+
+    </Router>
   );
 }
 
-export default App;

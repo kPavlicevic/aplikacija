@@ -40,6 +40,13 @@ builder.Services.AddDbContext<FilmRecenzijaContext> (o =>
         )
     );
 
+builder.Services.AddCors(opcije =>
+{
+    opcije.AddPolicy("CorsPolicy",
+        builder =>
+        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -59,6 +66,8 @@ app.UseHttpsRedirection();
 
 app.MapControllers();
 app.UseStaticFiles();
+
+
 
 app.UseCors("CorsPolicy");
 

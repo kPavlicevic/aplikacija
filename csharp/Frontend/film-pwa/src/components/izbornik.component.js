@@ -4,8 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 
-import logo from '../logo.svg';
-
+import logo from '../images/logo.png';
 
 export default class Izbornik extends Component{
 

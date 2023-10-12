@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Button, Container, Table } from "react-bootstrap";
-import FilmDataServices from "../../services/film.services";
+import FilmDataServices from "../../services/film.service";
 import { Link } from "react-router-dom";
 import {FaEdit, FaTrash} from "react-icons/fa";
 
@@ -8,8 +8,6 @@ export default class Filmovi extends Component{
 
     constructor(props){
         super(props);
-        this.dohvatiFilmovi = this.dohvatiFilmovi.bind(this);
-        this.obrisiFilm = this.obrisiFilm.bind(this);
 
         this.state = {
             filmovi: []
@@ -24,7 +22,6 @@ export default class Filmovi extends Component{
 
         await FilmDataServices.get()
         .then(response => {
-            console.log(response);
             this.setState({
                 filmovi: response.data
             });
@@ -79,7 +76,7 @@ export default class Filmovi extends Component{
                                 </Link>
 
                                 <Button variant="danger" className="gumb"
-                                onClick={()=>this.obrisiFilm(film.sifra)}>
+                                onClick={()=>this.obrisiFilm(film.sifra)} >
                                     <FaTrash />
                                 </Button>
 

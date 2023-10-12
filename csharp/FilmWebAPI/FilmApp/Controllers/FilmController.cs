@@ -66,6 +66,35 @@ namespace FilmRecenzijaApp.Controllers
 
         }
 
+        [HttpGet]
+        [Route("{sifra:int}")]
+        public IActionResult GetBySifra(int sifra)
+        {
+
+            if (sifra <= 0)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var s = _context.Film.Find(sifra);
+
+                if (s == null)
+                {
+                    return StatusCode(StatusCodes.Status204NoContent, s);
+                }
+
+                return new JsonResult(s);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
+            }
+
+        }
+
 
         /// <summary>Dodaje film u bazu</summary>
         /// <remarks>
@@ -188,7 +217,7 @@ namespace FilmRecenzijaApp.Controllers
             var filmBaza = _context.Film.Find(sifra);
             if (filmBaza == null)
             {
-                return NoContent();
+                return BadRequest();
             }
 
             try
@@ -200,7 +229,9 @@ namespace FilmRecenzijaApp.Controllers
             }
             catch (Exception ex)
             {
-                return new JsonResult("{\"poruka\":\"Ne može se obrisati\"}");
+                return StatusCode(StatusCodes.Status400BadRequest,
+                                  "Ne može se obrisati film jer ima na sebi glumca");
+                //return new JsonResult("{\"poruka\":\"Ne može se obrisati\"}");
             }
         }
 

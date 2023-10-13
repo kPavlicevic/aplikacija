@@ -36,7 +36,7 @@ export default class PromjeniFilm extends Component {
         this.setState({
           film: response.data
         });
-       // console.log(response.data);
+        console.log(response.data);
       })
       .catch(e => {
         console.log(e);

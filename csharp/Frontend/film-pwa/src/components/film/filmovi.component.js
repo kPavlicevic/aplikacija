@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Button, Container, Table } from "react-bootstrap";
-import FilmDataServices from "../../services/film.service";
+import FilmDataService from "../../services/film.service";
 import { Link } from "react-router-dom";
 import {FaEdit, FaTrash} from "react-icons/fa";
 
@@ -20,12 +20,11 @@ export default class Filmovi extends Component{
 
     async dohvatiFilmovi(){
 
-        await FilmDataServices.get()
+        await FilmDataService.get()
         .then(response => {
             this.setState({
                 filmovi: response.data
             });
-            console.log(response.data);
         })
         .catch(e =>{
             console.log(e);
@@ -33,7 +32,7 @@ export default class Filmovi extends Component{
     }
 
     async obrisiFilm(sifra){
-        const odgovor = await FilmDataServices.delete(sifra);
+        const odgovor = await FilmDataService.delete(sifra);
         if(odgovor.ok){
             this.dohvatiFilmovi();
         }else{
@@ -75,7 +74,7 @@ export default class Filmovi extends Component{
                                     <FaEdit />
                                 </Link>
 
-                                <Button variant="danger" className="gumb"
+                                <Button variant="danger" className="gumb" disabled
                                 onClick={()=>this.obrisiFilm(film.sifra)} >
                                     <FaTrash />
                                 </Button>

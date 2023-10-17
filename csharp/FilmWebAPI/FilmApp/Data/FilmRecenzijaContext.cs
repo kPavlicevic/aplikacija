@@ -18,6 +18,7 @@ namespace FilmRecenzijaApp.Data
         public DbSet<Ocjena> Ocjena { get; set; }
 
         public DbSet<Slika> Slika { get; set; }
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

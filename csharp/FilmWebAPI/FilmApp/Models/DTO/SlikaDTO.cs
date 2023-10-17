@@ -6,6 +6,7 @@
         public int Vrsta { get; set; }
         public int SifraVeze { get; set; }
         public byte[] Bitovi { get; set; }
-
     }
+
+    
 }

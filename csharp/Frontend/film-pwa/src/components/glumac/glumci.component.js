@@ -41,7 +41,7 @@ export default class Glumci extends Component {
   dohvatiGlumce() {
     GlumacDataService.getAll()
       .then((response) => {
-        //console.log(response.data);
+         console.log(response.data);
         this.setState({
           glumci: response.data,
         });
@@ -64,19 +64,24 @@ export default class Glumci extends Component {
   }
 
   nadjiSlikuGlumca = (sifra) => {
-    const slika = this.state.slike.filter(
-      (slika) => slika.sifraVeze === sifra
-    )[0];
+    const slika = Array.isArray(this.state.slike)
+      ? this.state.slike.filter((slika) => slika.sifraVeze === sifra)[0]
+      : [];
     if (slika) {
       return (
-        <Card.Img src={"data:image/png;base64," + slika.bitovi} variant="top" className="imgKontejner" height={256}/>
+        <Card.Img
+          src={"data:image/png;base64," + slika.bitovi}
+          variant="top"
+          className="imgKontejner"
+          height={256}
+        />
       );
     }
     return <Card.Img src={noimage} />;
   };
 
   async obrisiGlumac(sifra) {
-    console.log("brisem glumca sa sifrom: ", sifra);
+    console.log("brišem glumca sa šifrom: ", sifra);
     const odgovor = await GlumacDataService.delete(sifra);
     if (odgovor.ok) {
       this.dohvatiGlumce();
@@ -86,22 +91,22 @@ export default class Glumci extends Component {
     this.zatvoriModal();
   }
 
-  async dodajSliku() {
-    const file = document.getElementById("file").files[0];
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("Vrsta", 2);
-    formData.append("SifraVeze", 5);
-    const config = {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    };
-    const odgovor = await http.post("/Slika", formData, config);
-    if(odgovor.status === 200){
-      alert("slika usjpješno spremljena, osvježite");
-    }
-  }
+  // async dodajSliku() {
+  //   const file = document.getElementById("file").files[0];
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+  //   formData.append("Vrsta", 2);
+  //   formData.append("SifraVeze", 5);
+  //   const config = {
+  //     headers: {
+  //       "Content-Type": "multipart/form-data",
+  //     },
+  //   };
+  //   const odgovor = await http.post("/Slika", formData, config);
+  //   if(odgovor.status === 200){
+  //     alert("slika uspješno spremljena, osvježite");
+  //   }
+  // }
 
   render() {
     const { glumci } = this.state;
@@ -147,9 +152,8 @@ export default class Glumci extends Component {
             ))}
         </Row>
 
-       
         <input type="file" id="file" />
-        <Button onClick={this.dodajSliku}>Spremit sliku</Button>
+        {/* <Button onClick={this.dodajSliku}>Spremit sliku</Button> */}
 
         <Modal show={this.state.prikaziModal} onHide={this.zatvoriModal}>
           <Modal.Header closeButton>

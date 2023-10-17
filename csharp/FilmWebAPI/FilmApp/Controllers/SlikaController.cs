@@ -37,7 +37,7 @@ namespace FilmRecenzijaApp.Controllers
                     Sifra = slika.Sifra,
                     Vrsta = slika.Vrsta,
                     SifraVeze = slika.SifraVeze,
-                    Bitovi = slika.Bytes
+                    Bitovi = slika.Bitovi
                 };
 
                 return Ok(vrati);
@@ -60,6 +60,7 @@ namespace FilmRecenzijaApp.Controllers
                 var slikeGlumaca = _context.Slika.
                     Where(s => s.Vrsta == 2).ToList();
 
+
                 if (slikeGlumaca == null) {
                     return NoContent();
                 }
@@ -73,7 +74,7 @@ namespace FilmRecenzijaApp.Controllers
                           Sifra = s.Sifra,
                           Vrsta = s.Vrsta,
                           SifraVeze = s.SifraVeze,
-                          Bitovi = s.Bytes
+                          Bitovi = s.Bitovi
                       };
                       vrati.Add(sdto);
                 });
@@ -102,7 +103,7 @@ namespace FilmRecenzijaApp.Controllers
                     Slika s = new Slika() {
                         Vrsta = Vrsta,
                         SifraVeze = SifraVeze,
-                        Bytes = bitovi,
+                        Bitovi = bitovi,
                     };
                     _context.Slika.Add(s);
                     _context.SaveChanges();

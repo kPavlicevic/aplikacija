@@ -65,13 +65,13 @@ namespace FilmRecenzijaApp.Controllers
 
                 List<KomentarDTO> vrati = new();
 
-                film.Komentari.ForEach(k =>
+                film.Komentari.ForEach(kom =>
                 {
                     vrati.Add(new KomentarDTO()
                     {
-                        Sifra = k.Sifra,
-                        Korisnik = k.Korisnik.KorisnickoIme,
-                        Sadrzaj = k.Sadrzaj,
+                        Sifra = kom.Sifra,
+                        Korisnik = kom.Korisnik.KorisnickoIme,
+                        Sadrzaj = kom.Sadrzaj,
                     });
                 });
 

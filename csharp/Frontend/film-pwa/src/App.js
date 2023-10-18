@@ -7,6 +7,8 @@ import Filmovi from "./components/film/filmovi.component";
 import DodajFilm from "./components/film/dodajFilm.component";
 import PromjeniFilm from "./components/film/promjeniFilm.component";
 import Glumci from "./components/glumac/glumci.component";
+import Prijava from "./components/prijava/prijava.component";
+import { LOGIN, REGISTER } from "./konstante";
 
 export default function App() {
   return (
@@ -18,6 +20,8 @@ export default function App() {
         <Route path="/filmovi/dodaj" element={<DodajFilm />} />
         <Route path="/filmovi/:sifra" element={<PromjeniFilm />} />
         <Route path="/glumci" element={<Glumci />} />
+        <Route path="/prijava" element={<Prijava tip={LOGIN}/>} />
+        <Route path="/registracija" element={<Prijava tip={REGISTER} />} />
       </Routes>
     </Router>
   );

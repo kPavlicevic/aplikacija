@@ -23,6 +23,7 @@ export default class Izbornik extends Component{
                     <NavDropdown.Item href="/glumci">
                       Glumci
                     </NavDropdown.Item>
+                    <NavDropdown.Item href="/prijava">Prijavi se</NavDropdown.Item>
                     <NavDropdown.Divider />
                     <NavDropdown.Item target="_blank" href="https://kpavlicevic-001-site1.ctempurl.com/swagger/index.html">
                       Swagger

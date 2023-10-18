@@ -49,7 +49,7 @@ create table slika(
 	sifra int not null primary key identity (1,1),
 	vrsta int not null,
 	sifraVeze int not null,
-	bytes varbinary(MAX)
+	bitovi varbinary(MAX)
 );
 
 alter table uloga add foreign key (film) references film(sifra) on delete cascade;

@@ -12,6 +12,22 @@ code {
     monospace;
 }
 
-/* .imgKontejner{
+.imgKontejner{
   object-fit: scale-down;
-} */
+}
+
+.loginForm{
+  border: 1px solid black;
+  border-radius: 15px;
+  padding: 25px;
+  font-size: medium;
+  width: 50vw;
+  text-align: start;
+}
+
+.center{
+  display:flex;
+  flex-direction: column;
+  margin-top: 10vh;
+  align-items: center;
+}

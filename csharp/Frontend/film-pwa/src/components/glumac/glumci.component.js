@@ -41,7 +41,7 @@ export default class Glumci extends Component {
   dohvatiGlumce() {
     GlumacDataService.getAll()
       .then((response) => {
-         console.log(response.data);
+        console.log(response.data);
         this.setState({
           glumci: response.data,
         });
@@ -64,9 +64,9 @@ export default class Glumci extends Component {
   }
 
   nadjiSlikuGlumca = (sifra) => {
-    const slika = Array.isArray(this.state.slike)
-      ? this.state.slike.filter((slika) => slika.sifraVeze === sifra)[0]
-      : [];
+    const slika = this.state.slike.filter(
+      (slika) => slika.sifraVeze === sifra
+    )[0];
     if (slika) {
       return (
         <Card.Img

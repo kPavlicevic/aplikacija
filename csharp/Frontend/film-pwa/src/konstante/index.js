@@ -16,8 +16,6 @@ export const REGISTER = {
 };
 
 export const AUTH = {
-    auth: {
       korisnickoIme: "",
       prijavljen: false,
-    },
   };

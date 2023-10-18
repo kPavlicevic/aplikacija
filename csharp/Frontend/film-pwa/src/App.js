@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Izbornik from "./components/izbornik.component";
@@ -11,18 +11,21 @@ import Prijava from "./components/prijava/prijava.component";
 import { LOGIN, REGISTER } from "./konstante";
 
 export default function App() {
+
+  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem("auth")));
+
   return (
-    <Router>
-      <Izbornik />
-      <Routes>
-        <Route path="/" element={<Pocetna />} />
-        <Route path="/filmovi" element={<Filmovi />} />
-        <Route path="/filmovi/dodaj" element={<DodajFilm />} />
-        <Route path="/filmovi/:sifra" element={<PromjeniFilm />} />
-        <Route path="/glumci" element={<Glumci />} />
-        <Route path="/prijava" element={<Prijava tip={LOGIN}/>} />
-        <Route path="/registracija" element={<Prijava tip={REGISTER} />} />
-      </Routes>
-    </Router>
+      <Router>
+        <Izbornik auth={auth}/>
+        <Routes>
+          <Route path="/" element={<Pocetna />} />
+          <Route path="/filmovi" element={<Filmovi />} />
+          <Route path="/filmovi/dodaj" element={<DodajFilm />} />
+          <Route path="/filmovi/:sifra" element={<PromjeniFilm />} />
+          <Route path="/glumci" element={<Glumci />} />
+          <Route path="/prijava" element={<Prijava tip={LOGIN} />} />
+          <Route path="/registracija" element={<Prijava tip={REGISTER} />} />
+        </Routes>
+      </Router>
   );
 }

@@ -26,9 +26,23 @@ code {
   margin-top: 8px;
 }
 
-.center{
+.center_stupac{
   display:flex;
   flex-direction: column;
   align-items: center;
   margin-top: 20px;
+}
+
+.center_vertical{
+  margin-top:58px;
+}
+
+.naslovna_linkovi{
+  display: flex;
+  justify-content: space-evenly;
+  margin-top:50px;
+}
+
+.naslovna_linkovi a{
+  width:200px;
 }

@@ -66,7 +66,7 @@ namespace FilmRecenzijaApp.Controllers
         /// <remarks> 
         ///**Primjer upita:**
         ///```
-        ///POST api/v1/Korisnik
+        ///POST api/v1/Korisnik/registracija
         ///{
         /// Korisničko ime:"dominik96", 
         /// Lozinka:"hr4dt5"
@@ -103,7 +103,7 @@ namespace FilmRecenzijaApp.Controllers
                     return Ok(k);
 
                 }
-                return BadRequest("Korisnik već postiji");
+                return BadRequest("Korisnik već postoji");
 
             }
             catch (Exception ex)
@@ -117,7 +117,7 @@ namespace FilmRecenzijaApp.Controllers
         /// <remarks> 
         ///**Primjer upita:**
         ///```
-        ///POST api/v1/Korisnik/Login
+        ///POST api/v1/Korisnik/prijava
         ///{
         /// Korisničko ime:"dominik96", 
         /// Lozinka:"hr4dt5"

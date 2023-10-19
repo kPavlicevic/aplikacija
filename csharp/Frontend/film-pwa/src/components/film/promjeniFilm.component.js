@@ -6,7 +6,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from "react-router-dom";
-import { Modal, ModalBody } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
 import noimage from "../../images/no-image-found-360x250.png";
 
 export default class PromjeniFilm extends Component {
@@ -20,9 +20,11 @@ export default class PromjeniFilm extends Component {
     this.otvoriModal = this.otvoriModal.bind(this);
     this.state = {
       film: {},
-      modal:{
-        otvori:false,
-      }
+      modal: {
+        uredi: false,
+        ocijeni: false,
+        komentiraj: false,
+      },
     };
   }
 
@@ -61,12 +63,6 @@ export default class PromjeniFilm extends Component {
 
     // Read the form data
     const podaci = new FormData(e.target);
-    //Object.keys(formData).forEach(fieldName => {
-    // console.log(fieldName, formData[fieldName]);
-    //})
-
-    //console.log(podaci.get('verificiran'));
-    // You can pass formData as a service body directly:
 
     this.promjeniFilm({
       naziv: podaci.get("naziv"),
@@ -76,45 +72,68 @@ export default class PromjeniFilm extends Component {
     });
   }
 
-  zatvoriModal(){
+  zatvoriModal() {
     this.setState({
-      modal:{
-        otvori:false   
-      }
-    })
+      modal: {
+        uredi: false,
+        ocijeni: false,
+        komentiraj: false,
+      },
+    });
   }
 
-  otvoriModal(){
-    this.setState({
-      modal:{
-        otvori:true
-      }
-    })
+  otvoriModal(tipModala) {
+    if (tipModala === "u") {
+      this.setState({
+        modal: {
+          uredi: true,
+        },
+      });
+    } else if (tipModala === "o") {
+      this.setState({
+        modal: {
+          ocijeni: true,
+        },
+      });
+    } else if (tipModala === "k") {
+      this.setState({
+        modal: {
+          komentiraj: true,
+        },
+      });
+    }
   }
 
   render() {
-    const { film,modal } = this.state;
+    const { film, modal } = this.state;
     return (
       <>
-        <img src={noimage} alt="slika filma"/>
+        <img src={noimage} alt="slika filma" />
         <ul>
           <li>Naziv: {film.naziv}</li>
           <li>Godina: {film.godina}</li>
           <li>Redatlje: {film.redatelj}</li>
           <li>Žanr: {film.zanr}</li>
-          <li>Glumci: {
-              film.glumci && film.glumci.map(glumac => (
-                <div>
+          <li>
+            Glumci:{" "}
+            {film.glumci &&
+              film.glumci.map((glumac) => (
+                <div key={glumac.sifra}>
                   <Link to={"/glumci/" + glumac.sifra}>
                     {glumac.ime} {glumac.prezime}
                   </Link>
                 </div>
-              ))
-            }</li>
+              ))}
+          </li>
         </ul>
-        <Button onClick={this.otvoriModal}>Uredi</Button>
-        <Modal show={modal.otvori}>
-          <ModalBody>
+        <Button onClick={() => this.otvoriModal("u")}>Uredi</Button>
+        <Button onClick={() => this.otvoriModal("o")}>Ocijeni</Button>
+        <Button onClick={() => this.otvoriModal("k")}>Komentiraj</Button>
+
+        {/* Modal promjeni */}
+
+        <Modal show={modal.uredi}>
+          <Modal.Body>
             <Container>
               <Form onSubmit={this.handleSubmit}>
                 <Form.Group className="mb-3" controlId="naziv">
@@ -165,7 +184,10 @@ export default class PromjeniFilm extends Component {
 
                 <Row>
                   <Col>
-                    <Button className="btn btn-danger gumb" onClick={this.zatvoriModal}>
+                    <Button
+                      className="btn btn-danger gumb"
+                      onClick={this.zatvoriModal}
+                    >
                       Odustani
                     </Button>
                   </Col>
@@ -177,7 +199,80 @@ export default class PromjeniFilm extends Component {
                 </Row>
               </Form>
             </Container>
-          </ModalBody>
+          </Modal.Body>
+        </Modal>
+
+        {/*Modal ocijeni*/}
+
+        <Modal show={modal.ocijeni}>
+          <Modal.Body>
+            <Container>
+              <Form>
+                <Form.Group className="mb-3" controlId="ocjena">
+                  <Form.Label>Ocjena</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="ocjena"
+                    placeholder="1-5"
+                    max={5}
+                    min={1}
+                    step={0.1}
+                    required
+                  />
+                </Form.Group>
+
+                <Row>
+                  <Col>
+                    <Button
+                      className="btn btn-danger gumb"
+                      onClick={this.zatvoriModal}
+                    >
+                      Odustani
+                    </Button>
+                  </Col>
+                  <Col>
+                    <Button variant="primary" className="gumb" type="submit">
+                      Ocijeni
+                    </Button>
+                  </Col>
+                </Row>
+              </Form>
+            </Container>
+          </Modal.Body>
+        </Modal>
+
+        {/*Modal komentiraj*/}
+        <Modal show={modal.komentiraj}>
+          <Modal.Body>
+            <Form>
+            <Form.Group className="mb-3" controlId="komentar">
+                  <Form.Label>Komentar</Form.Label>
+                  <Form.Control
+                    type="text"
+                    as="textarea"
+                    name="komentar"
+                    placeholder="Komentiraj"
+                    maxLength={250}
+                    required
+                  />
+                </Form.Group>
+            <Row>
+              <Col>
+                <Button
+                  className="btn btn-danger gumb"
+                  onClick={this.zatvoriModal}
+                  >
+                  Odustani
+                </Button>
+              </Col>
+              <Col>
+                <Button variant="primary" className="gumb" type="submit">
+                  Komentiraj
+                </Button>
+              </Col>
+            </Row>
+                  </Form>
+          </Modal.Body>
         </Modal>
       </>
     );

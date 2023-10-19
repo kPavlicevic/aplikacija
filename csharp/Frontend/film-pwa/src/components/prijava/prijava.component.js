@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import AuthService from "../../services/auth.service";
+import { LOGIN } from "../../konstante";
 
 export default class Prijava extends Component {
   constructor(props) {
@@ -10,7 +11,8 @@ export default class Prijava extends Component {
       tip: props.tip,
       error: "",
     };
-    this.submit = this.submit.bind(this);
+    this.prijava = this.prijava.bind(this);
+    this.registracija = this.registracija.bind(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -22,14 +24,14 @@ export default class Prijava extends Component {
     }
   }
 
-  async submit(e) {
+  async prijava(e) {
     e.preventDefault();
     const korisnickoIme = e.target.uName.value.trim();
     const lozinka = e.target.pwd.value;
 
     if (!korisnickoIme) {
       this.setState({
-        error: "Neispravan unos korisničkog imena",
+        error: "Neispravan unos korisničkog imena.",
       });
       return;
     }
@@ -54,13 +56,50 @@ export default class Prijava extends Component {
     }
   }
 
+  async registracija(e) {
+    e.preventDefault();
+    const korisnickoIme = e.target.uName.value.trim();
+    const lozinka = e.target.pwd.value;
+
+    if (!korisnickoIme) {
+      this.setState({
+        error: "Neispravan unos korisničkog imena.",
+      });
+      return;
+    }
+
+    if (!lozinka || lozinka.length < 4) {
+      this.setState({
+        error: "Lozinka mora sadržavati barem 4 znaka!",
+      });
+      return;
+    }
+
+    const odgovor = await AuthService.registracija({
+      korisnickoIme,
+      lozinka
+    });
+
+    if(odgovor.ok) {
+      window.location.href = odgovor.preusmjeri 
+    }else{
+      this.setState({
+        error: odgovor.error
+      })
+    }
+
+  }
+
   render() {
     const { naslov, link } = this.state.tip;
     const { error } = this.state;
     return (
-      <Container className="center">
+      <Container className="center_stupac">
         {<h2>{naslov}</h2>}
-        <Form className="loginForm center" onSubmit={this.submit}>
+        <Form
+          className="loginForm center_stupac"
+          onSubmit={naslov === LOGIN.naslov ? this.prijava : this.registracija}
+        >
           <Form.Group className="mb-3" controlId="uName">
             <Form.Label>Username</Form.Label>
             <Form.Control type="text" placeholder="Enter username" required />

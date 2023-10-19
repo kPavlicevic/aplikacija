@@ -7,12 +7,15 @@ import Filmovi from "./components/film/filmovi.component";
 import DodajFilm from "./components/film/dodajFilm.component";
 import PromjeniFilm from "./components/film/promjeniFilm.component";
 import Glumci from "./components/glumac/glumci.component";
+import DodajGlumac from "./components/glumac/dodajGlumac.componenet";
+import PromjeniGlumac from "./components/glumac/promjeniGlumac.component";
 import Prijava from "./components/prijava/prijava.component";
 import { LOGIN, REGISTER } from "./konstante";
 
 export default function App() {
 
   const [auth, setAuth] = useState(JSON.parse(localStorage.getItem("auth")));
+  
 
   return (
       <Router>
@@ -23,6 +26,8 @@ export default function App() {
           <Route path="/filmovi/dodaj" element={<DodajFilm />} />
           <Route path="/filmovi/:sifra" element={<PromjeniFilm />} />
           <Route path="/glumci" element={<Glumci />} />
+          <Route path="/glumci/dodaj" element={<DodajGlumac />} />
+          <Route path="/glumci/:sifra" element={<PromjeniGlumac />} />
           <Route path="/prijava" element={<Prijava tip={LOGIN} />} />
           <Route path="/registracija" element={<Prijava tip={REGISTER} />} />
         </Routes>

@@ -37,7 +37,7 @@ class FilmDataService{
     }
 
     async put(sifra,film){
-        //console.log(smjer);
+        //console.log(film);
         const odgovor = await http.put('/film/' + sifra,film)
            .then(response => {
              return {ok:true, poruka: 'Promjenio film'}; // return u odgovor

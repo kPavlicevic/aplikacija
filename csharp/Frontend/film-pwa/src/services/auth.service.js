@@ -20,7 +20,25 @@ class AuthService {
         return { ok: false, error: e.response.data };
       });
 
-      return odgovor;
+    return odgovor;
+  }
+
+  async registracija(korisnikDto) {
+    const odgovor = await http
+      .post("/Korisnik/registracija", korisnikDto)
+      .then((response) => {
+        const auth = {
+          prijavljen: true,
+          korisnickoIme: korisnikDto.korisnickoIme,
+        };
+        localStorage.setItem("auth", JSON.stringify(auth));
+        return { ok: true, preusmjeri: "/" };
+      })
+      .catch((e) => {
+        return { ok: false, error: e.response.data };
+      });
+
+    return odgovor;
   }
 }
 

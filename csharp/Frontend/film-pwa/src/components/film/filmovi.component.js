@@ -84,7 +84,7 @@ export default class Filmovi extends Component{
                     ))
                     :
                     <tr>
-                        <td align="center" colspan="5">Ne postoji niti jedan film</td>
+                        <td align="center_stupac" colspan="5">Ne postoji niti jedan film</td>
                     </tr>
                 }
                 </tbody>

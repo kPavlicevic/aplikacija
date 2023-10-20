@@ -6,16 +6,26 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from "react-router-dom";
-import { Modal } from "react-bootstrap";
+import { ButtonGroup, Card, ListGroup, Modal } from "react-bootstrap";
 import noimage from "../../images/no-image-found-360x250.png";
+import OcjenaService from "../../services/ocjena.service";
+import KomentarService from "../../services/komentar.service";
 
 export default class PromjeniFilm extends Component {
   constructor(props) {
     super(props);
 
     this.film = this.dohvatiFilm();
+    this.prosjek = this.dohvatiProsjek();
     this.promjeniFilm = this.promjeniFilm.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.ocijeniFilm = this.ocijeniFilm.bind(this);
+    this.obrisiOcjenu = this.obrisiOcjenu.bind(this);
+    this.komentiraj = this.komentiraj.bind(this);
+    this.handlePromjena = this.handlePromjena.bind(this);
+    this.handleOcijeni = this.handleOcijeni.bind(this);
+    this.handleObrisiOcjenu = this.handleObrisiOcjenu.bind(this);
+    this.handleKomentiraj = this.handleKomentiraj.bind(this);
+
     this.zatvoriModal = this.zatvoriModal.bind(this);
     this.otvoriModal = this.otvoriModal.bind(this);
     this.state = {
@@ -25,6 +35,7 @@ export default class PromjeniFilm extends Component {
         ocijeni: false,
         komentiraj: false,
       },
+      prosjek: 0,
     };
   }
 
@@ -37,6 +48,21 @@ export default class PromjeniFilm extends Component {
           film: response.data,
         });
         console.log(response.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+
+  async dohvatiProsjek() {
+    let href = window.location.href;
+    let niz = href.split("/");
+    let sifraFilma = niz[niz.length - 1];
+    await OcjenaService.getProsjek(sifraFilma)
+      .then((response) => {
+        this.setState({
+          prosjek: response.data,
+        });
       })
       .catch((e) => {
         console.log(e);
@@ -57,7 +83,7 @@ export default class PromjeniFilm extends Component {
     }
   }
 
-  handleSubmit(e) {
+  handlePromjena(e) {
     // Prevent the browser from reloading the page
     e.preventDefault();
 
@@ -70,6 +96,75 @@ export default class PromjeniFilm extends Component {
       redatelj: podaci.get("redatelj"),
       zanr: podaci.get("zanr"),
     });
+  }
+
+  async ocijeniFilm(ocjena) {
+    let href = window.location.href;
+    let niz = href.split("/");
+    let sifraFilma = niz[niz.length - 1];
+
+    const odgovor = await OcjenaService.post(sifraFilma, ocjena);
+    if (odgovor.ok) {
+      alert("Ocjena uspješno spremljena!");
+      this.zatvoriModal();
+      this.dohvatiProsjek();
+      //window.location.href = odgovor.prusmjeri;
+    } else {
+      alert(odgovor.error);
+      this.zatvoriModal();
+    }
+  }
+
+  handleOcijeni(e) {
+    e.preventDefault();
+    const podaci = new FormData(e.target);
+
+    this.ocijeniFilm({
+      Vrijednost: podaci.get("ocjena"),
+      Korisnik: JSON.parse(localStorage.getItem("auth"))?.korisnickoIme,
+    });
+  }
+
+  async obrisiOcjenu(sifraFilma, korisnickoIme) {
+    const odgovor = await OcjenaService.delete(sifraFilma, korisnickoIme);
+    if (odgovor.ok) {
+      alert("Ocjena uspješno obrisana!");
+      this.zatvoriModal();
+      this.dohvatiProsjek();
+    } else {
+      alert(odgovor.error);
+    }
+  }
+
+  handleObrisiOcjenu() {
+    const sifraFilma = this.state.film.sifra;
+    const korisnickoIme = JSON.parse(
+      localStorage.getItem("auth")
+    )?.korisnickoIme;
+    this.obrisiOcjenu(sifraFilma, korisnickoIme);
+  }
+
+
+  async komentiraj(komentarDto){
+    const odgovor = await KomentarService.postKomentar(this.state.film.sifra, komentarDto);
+    if(odgovor.ok){
+      alert("Komentar uspješno dodan!");
+      this.zatvoriModal();
+      this.dohvatiFilm();
+    }else{
+      alert(odgovor.error);
+      this.zatvoriModal();
+    }
+  }
+
+  handleKomentiraj(e){
+    e.preventDefault();
+    const podaci = new FormData(e.target);
+    console.log(podaci.get("komentar"));
+    this.komentiraj({
+      korisnik: JSON.parse(localStorage.getItem("auth"))?.korisnickoIme,
+      sadrzaj: podaci.get("komentar")
+    })
   }
 
   zatvoriModal() {
@@ -105,37 +200,66 @@ export default class PromjeniFilm extends Component {
   }
 
   render() {
-    const { film, modal } = this.state;
+    const { film, modal, prosjek } = this.state;
     return (
       <>
-        <img src={noimage} alt="slika filma" />
-        <ul>
-          <li>Naziv: {film.naziv}</li>
-          <li>Godina: {film.godina}</li>
-          <li>Redatlje: {film.redatelj}</li>
-          <li>Žanr: {film.zanr}</li>
-          <li>
-            Glumci:{" "}
-            {film.glumci &&
-              film.glumci.map((glumac) => (
-                <div key={glumac.sifra}>
-                  <Link to={"/glumci/" + glumac.sifra}>
-                    {glumac.ime} {glumac.prezime}
-                  </Link>
-                </div>
-              ))}
-          </li>
-        </ul>
-        <Button onClick={() => this.otvoriModal("u")}>Uredi</Button>
-        <Button onClick={() => this.otvoriModal("o")}>Ocijeni</Button>
-        <Button onClick={() => this.otvoriModal("k")}>Komentiraj</Button>
+        <Container>
+          <Row>
+            <Col md={6} lg={5}>
+              <img src={noimage} className="imgKontejner" alt="slika filma" />
+            </Col>
+            <Col>
+              <ul>
+                <li>Naziv: {film.naziv}</li>
+                <li>Godina: {film.godina}</li>
+                <li>Redatlje: {film.redatelj}</li>
+                <li>Žanr: {film.zanr}</li>
+                <li>
+                  Glumci:{" "}
+                  {film.glumci &&
+                    film.glumci.map((glumac) => (
+                      <div key={glumac.sifra}>
+                        <Link to={"/glumci/" + glumac.sifra}>
+                          {glumac.ime} {glumac.prezime}
+                        </Link>
+                      </div>
+                    ))}
+                </li>
+                <li>Prosječna ocjena: {Math.round(prosjek * 10) / 10}</li>
+              </ul>
+            </Col>
+          </Row>
 
+          <ButtonGroup size="lg" className="gumb_grupa">
+            <Button onClick={() => this.otvoriModal("u")}>Uredi</Button>
+            <Button onClick={() => this.otvoriModal("o")}>Ocijeni</Button>
+            <Button onClick={() => this.otvoriModal("k")}>Komentiraj</Button>
+          </ButtonGroup>
+
+          <div className="komentari">
+            <Card>
+              <ListGroup variant="flush">
+                {film.komentari &&
+                  film.komentari.map((komentar) => (
+                    <ListGroup.Item key={komentar.sifra}>
+                      <Card.Header>{komentar.korisnik}</Card.Header>
+                      <Card.Body>
+                        <blockquote className="blockquote mb-0">
+                          {komentar.sadrzaj}
+                        </blockquote>
+                      </Card.Body>
+                    </ListGroup.Item>
+                  ))}
+              </ListGroup>
+            </Card>
+          </div>
+        </Container>
         {/* Modal promjeni */}
 
         <Modal show={modal.uredi}>
           <Modal.Body>
             <Container>
-              <Form onSubmit={this.handleSubmit}>
+              <Form onSubmit={this.handlePromjena}>
                 <Form.Group className="mb-3" controlId="naziv">
                   <Form.Label>Naziv</Form.Label>
                   <Form.Control
@@ -205,9 +329,10 @@ export default class PromjeniFilm extends Component {
         {/*Modal ocijeni*/}
 
         <Modal show={modal.ocijeni}>
+          <Modal.Header closeButton onHide={this.zatvoriModal}></Modal.Header>
           <Modal.Body>
             <Container>
-              <Form>
+              <Form onSubmit={this.handleOcijeni}>
                 <Form.Group className="mb-3" controlId="ocjena">
                   <Form.Label>Ocjena</Form.Label>
                   <Form.Control
@@ -216,7 +341,7 @@ export default class PromjeniFilm extends Component {
                     placeholder="1-5"
                     max={5}
                     min={1}
-                    step={0.1}
+                    step={0.5}
                     required
                   />
                 </Form.Group>
@@ -225,9 +350,9 @@ export default class PromjeniFilm extends Component {
                   <Col>
                     <Button
                       className="btn btn-danger gumb"
-                      onClick={this.zatvoriModal}
+                      onClick={this.handleObrisiOcjenu}
                     >
-                      Odustani
+                      Obriši ako ste već ocijenili
                     </Button>
                   </Col>
                   <Col>
@@ -244,34 +369,34 @@ export default class PromjeniFilm extends Component {
         {/*Modal komentiraj*/}
         <Modal show={modal.komentiraj}>
           <Modal.Body>
-            <Form>
-            <Form.Group className="mb-3" controlId="komentar">
-                  <Form.Label>Komentar</Form.Label>
-                  <Form.Control
-                    type="text"
-                    as="textarea"
-                    name="komentar"
-                    placeholder="Komentiraj"
-                    maxLength={250}
-                    required
-                  />
-                </Form.Group>
-            <Row>
-              <Col>
-                <Button
-                  className="btn btn-danger gumb"
-                  onClick={this.zatvoriModal}
+            <Form onSubmit={this.handleKomentiraj}>  
+              <Form.Group className="mb-3" controlId="komentar">
+                <Form.Label>Komentar</Form.Label>
+                <Form.Control
+                  type="text"
+                  as="textarea"
+                  name="komentar"
+                  placeholder="Komentiraj"
+                  maxLength={250}
+                  required
+                />
+              </Form.Group>
+              <Row>
+                <Col>
+                  <Button
+                    className="btn btn-danger gumb"
+                    onClick={this.zatvoriModal}
                   >
-                  Odustani
-                </Button>
-              </Col>
-              <Col>
-                <Button variant="primary" className="gumb" type="submit">
-                  Komentiraj
-                </Button>
-              </Col>
-            </Row>
-                  </Form>
+                    Odustani
+                  </Button>
+                </Col>
+                <Col>
+                  <Button variant="primary" className="gumb" type="submit">
+                    Komentiraj
+                  </Button>
+                </Col>
+              </Row>
+            </Form>
           </Modal.Body>
         </Modal>
       </>

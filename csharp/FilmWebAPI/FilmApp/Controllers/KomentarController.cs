@@ -90,7 +90,7 @@ namespace FilmRecenzijaApp.Controllers
         /// <remarks>
         /// **Primjer upita:**
         ///```
-        ///POST api/v1/Film/1/dodajKomentar
+        ///POST api/v1/Komentar/1/dodajKomentar
         ///{
         /// "korisnik" : 1,
         /// "sadržaj" : "proizvoljni tekst komentara"
@@ -129,7 +129,7 @@ namespace FilmRecenzijaApp.Controllers
 
                 if (film == null || korisnik == null)
                 {
-                    return NoContent();
+                    return BadRequest("Film ne postoji ili niste prijavljeni");
                 }
 
                 Komentar noviKomentar = new Komentar()

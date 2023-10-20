@@ -46,3 +46,8 @@ code {
 .naslovna_linkovi a{
   width:200px;
 }
+
+.gumb_grupa{
+  width: 360px;
+  margin: 10px auto;
+}

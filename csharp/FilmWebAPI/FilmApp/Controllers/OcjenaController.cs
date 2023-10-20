@@ -14,9 +14,12 @@ namespace FilmRecenzijaApp.Controllers
     public class OcjenaController : ControllerBase
     {
         private readonly FilmRecenzijaContext _context;
-        public OcjenaController(FilmRecenzijaContext context)
+        private readonly ILogger<OcjenaController> _logger;
+        public OcjenaController(FilmRecenzijaContext context, ILogger<OcjenaController> logger)
         {
             _context = context;
+            _logger = logger;
+
         }
 
 
@@ -85,7 +88,7 @@ namespace FilmRecenzijaApp.Controllers
         /// <remarks>
         /// **Primjer upita:**
         ///```
-        ///    POST api/v1/Film/1/dodajOcjenu
+        ///    POST api/v1/Ocjena/1/dodajOcjenu
         ///    {
         ///     "korisnik" : "dominik96",
         ///     "vrijednost": 5
@@ -95,8 +98,10 @@ namespace FilmRecenzijaApp.Controllers
         /// <param name="sifra">šifra filma koji se ocjenjuje</param>
         /// <param name="ocjenaDTO">Korisničko ime i ocjena filma</param>
         /// <response code="200">Ocjena uspješno dodana</response>
-        /// <response code="204">Film ne postoji ili je korisnik već ocijenio ovaj film</response>
-        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
+        /// <response code="400">
+        ///     Zahtjev nije valjan (BadRequest) 
+        ///     Film ne postoji, ili korisnik nije prijavljen, ili je korisnik već ocijenio film
+        /// </response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpPost]
         [Route("{sifra:int}/dodajOcjenu")]
@@ -117,6 +122,7 @@ namespace FilmRecenzijaApp.Controllers
 
                 var film = _context.Film
                     .Include(f => f.Ocjene)
+                    .ThenInclude(o => o.Korisnik)
                     .FirstOrDefault(f => f.Sifra == sifra);
 
                 var korisnik = _context.Korisnik
@@ -124,12 +130,15 @@ namespace FilmRecenzijaApp.Controllers
 
                 if (film == null || korisnik == null)
                 {
-                    return NoContent();
+                    return BadRequest("Film ne postoji ili niste prijavljeni!");
                 }
 
+                _logger.LogInformation("{}", korisnik.KorisnickoIme);
+
                 foreach (Ocjena o in film.Ocjene) {
+                    _logger.LogInformation("ocjena - {}", o.Korisnik.KorisnickoIme);
                     if (o.Korisnik == korisnik) {
-                        return NoContent();
+                        return BadRequest("Film možete ocijeniti samo jednom!");
                     }
                 }
 
@@ -158,15 +167,20 @@ namespace FilmRecenzijaApp.Controllers
 
 
         /// <summary>Briše ocjenu s filma </summary>
-        /// <remarks> **Primjer upita:** ``` DELETE api/v1/film/1/obrisiOcjenu/1 ``` </remarks>
-        /// <param name="ocjenaSifra">Šifra ocjene koja se želi ukloniti</param>  
+        /// <remarks> 
+        /// **Primjer upita:** 
+        /// ``` 
+        /// DELETE api/v1/Ocjena/obrisi
+        /// ``` 
+        /// </remarks>
+        /// <param name="sifraFilma">Šifra filma sa kojeg se želi ukloniti ocjena</param>
+        /// <param name="korisnickoIme">Korisnik koji želi ukloniti ocjenu sa nekog filma kojeg je ocijenio</param>
         /// <response code="200">Ocjena uspješno uklonjena</response>
-        /// <response code="204">Film sa šifrom ne postoji u bazi ili ocjena sa šifromOcjena nije na tom filmu</response> 
-        /// <response code="400">Zahtjev nije isprava (BadRequest)</response>
+        /// <response code="400"> Korisnik još nije ocijenio film ili nije prijavljen</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpDelete]
-        [Route("/obrisiOcjenu")]
-        public IActionResult DeleteOcjena(int ocjenaSifra)
+        [Route("obrisi")]
+        public IActionResult DeleteOcjena(int sifraFilma, string korisnickoIme)
         {
 
             if (!ModelState.IsValid)
@@ -174,7 +188,7 @@ namespace FilmRecenzijaApp.Controllers
                 return BadRequest();
             }
 
-            if (ocjenaSifra <= 0)
+            if (sifraFilma <= 0)
             {
                 return BadRequest();
             }
@@ -182,11 +196,15 @@ namespace FilmRecenzijaApp.Controllers
             try
             {
 
-                var ocjena = _context.Ocjena.Find(ocjenaSifra);
+                var ocjena = _context.Ocjena
+                    .Include(o => o.Film)
+                    .Include(o => o.Korisnik)
+                    .FirstOrDefault(o => o.Film.Sifra == sifraFilma && 
+                    o.Korisnik.KorisnickoIme == korisnickoIme);
 
                 if (ocjena == null)
                 {
-                    return NoContent();
+                    return BadRequest("Niste još ocijenili ovaj film ili niste prijavljeni!");
                 }
 
                 _context.Ocjena.Remove(ocjena);
@@ -273,7 +291,7 @@ namespace FilmRecenzijaApp.Controllers
         //PAZI!!! samo korisnik koji je prvotno ostavio ocjenu može ju izmjeniti
 
         /// <summary> Dohvaćanje prosječne ocjena filma</summary>
-        /// <remarks> **Primjer upita:** ``` GET api/v1/film/1/ocjeneProsjek ``` </remarks>
+        /// <remarks> **Primjer upita:** ``` GET api/v1/Ocjena/1/ocjeneProsjek ``` </remarks>
         /// <param name="sifra">Šifra filma za kojeg se dohvaća prosječna ocjena</param>  
         /// <response code="200">Prosječna ocjena filma</response>
         /// <response code="204">Nema u bazi filma za kojeg želimo dohvatiti ocjene</response>

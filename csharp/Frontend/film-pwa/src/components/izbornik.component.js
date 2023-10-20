@@ -11,7 +11,10 @@ export default class Izbornik extends Component {
 
   constructor(props){
     super(props);
-    this.state= props.auth;
+    this.state= {
+      prijavljen : props.auth?.prijavljen,
+      korisnickoIme: props.auth?.korisnickoIme,
+    };
     this.odjava = this.odjava.bind(this);
   }
 

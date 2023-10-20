@@ -10,13 +10,12 @@ import Glumci from "./components/glumac/glumci.component";
 import DodajGlumac from "./components/glumac/dodajGlumac.componenet";
 import PromjeniGlumac from "./components/glumac/promjeniGlumac.component";
 import Prijava from "./components/prijava/prijava.component";
-import { LOGIN, REGISTER } from "./konstante";
+import { AUTH, LOGIN, REGISTER } from "./konstante";
 
 export default function App() {
 
   const [auth, setAuth] = useState(JSON.parse(localStorage.getItem("auth")));
   
-
   return (
       <Router>
         <Izbornik auth={auth}/>

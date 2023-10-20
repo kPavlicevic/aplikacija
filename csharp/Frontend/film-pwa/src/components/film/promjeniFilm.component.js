@@ -14,7 +14,7 @@ export default class PromjeniFilm extends Component {
     super(props);
 
     this.film = this.dohvatiFilm();
-    this.promjeniFIlm = this.promjeniFilm.bind(this);
+    this.promjeniFilm = this.promjeniFilm.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.zatvoriModal = this.zatvoriModal.bind(this);
     this.otvoriModal = this.otvoriModal.bind(this);

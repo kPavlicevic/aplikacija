@@ -299,14 +299,14 @@ namespace FilmRecenzijaApp.Controllers
 
                 if (film == null)
                 {
-                    return BadRequest();
+                    return BadRequest("Film ne postoji");
                 }
 
                 var glumac = _context.Glumac.Find(glumacSifra);
 
                 if (glumac == null)
                 {
-                    return BadRequest();
+                    return BadRequest("Glumacne postoji");
                 }
 
                 // kontrola da li je taj glumac već u tom filmu
@@ -316,7 +316,7 @@ namespace FilmRecenzijaApp.Controllers
                 }
                 else
                 {
-                    return NoContent();
+                    return BadRequest("Glumac je već dodan ovom filmu");
                 }
 
                 _context.Film.Update(film);

@@ -155,15 +155,15 @@ namespace FilmRecenzijaApp.Controllers
         }
 
         /// <summary> Briše komentar s filma </summary>
-        /// <remarks> **Primjer upita:** ``` DELETE api/v1/film/1/obrisiKomentar/1 ``` </remarks>
+        /// <remarks> **Primjer upita:** ``` DELETE api/v1/Komentar/1/obrisiKomentar ``` </remarks>
         /// <param name="komentarSifra">Šifra komentara koji se želi obrisati</param>  
         /// <response code="200">Komentar uspješno obrisan</response>
         /// <response code="204">Komentar sa predanom šifrom ne postoji</response>
         /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
         /// <response code="503">Na azure treba dodati IP u firewall</response>
         [HttpDelete]
-        [Route("/obrisiKomentar")]
-        public IActionResult DeleteKomentar(int komentarSifra)
+        [Route("{komentarSifra:int}/obrisiKomentar")]
+        public IActionResult DeleteKomentar(int komentarSifra, string korisnickoIme)
         {
 
             if (!ModelState.IsValid)
@@ -173,17 +173,20 @@ namespace FilmRecenzijaApp.Controllers
 
             if (komentarSifra <= 0)
             {
-                return BadRequest();
+                return BadRequest("Sifra je obvezna");
             }
 
             try
             {
 
-                var komentar = _context.Komentar.Find(komentarSifra);
-
+                var komentar = _context.Komentar
+                    .Include(komentar => komentar.Korisnik)
+                    .FirstOrDefault(komentar => komentar.Sifra == komentarSifra);
                 if (komentar == null)
                 {
-                    return NoContent();
+                    return BadRequest("Komentar pod ovom šifrom ne postoji.");
+                }else if(komentar.Korisnik.KorisnickoIme != korisnickoIme) {
+                    return BadRequest("Samo korisnik koji je kreirao komentar može ga obrisati.");
                 }
 
                 _context.Komentar.Remove(komentar);
@@ -229,7 +232,7 @@ namespace FilmRecenzijaApp.Controllers
 
             if (sifra <= 0)
             {
-                return BadRequest();
+                return BadRequest("Komentar pod ovom šifrom ne postoji");
             }
 
             try
@@ -246,7 +249,7 @@ namespace FilmRecenzijaApp.Controllers
                     return Ok();
                 }
                 else {
-                    return Unauthorized("Samo korsinik koji je kreirao komentar ga može izmjeniti");
+                    return BadRequest("Samo korsinik koji je kreirao komentar ga može izmjeniti");
                 }
 
 

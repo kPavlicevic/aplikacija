@@ -51,3 +51,21 @@ code {
   width: 360px;
   margin: 10px auto;
 }
+
+.komentar_glava{
+  display: flex;
+  justify-content: space-between;
+}
+
+.kontejner{
+  display:flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.glumciFilm{
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 5px;
+}

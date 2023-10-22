@@ -18,7 +18,7 @@ export default class PromjeniGlumac extends Component {
   constructor(props) {
     super(props);
     this.glumac = this.dohvatiGlumac();
-    this.trenutniaSlika = this.dohvatiSlikuGlumca();
+    this.trenutnaSlika = this.dohvatiSlikuGlumca();
     this.promjeniGlumac = this.promjeniGlumac.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.zatvoriModal = this.zatvoriModal.bind(this);
@@ -27,7 +27,7 @@ export default class PromjeniGlumac extends Component {
 
     this.state = {
       glumac: {},
-      trenutnaSlika: "",
+      trenutnaSlika: noimage,
       modal: {
         otvori: false,
       },
@@ -41,7 +41,6 @@ export default class PromjeniGlumac extends Component {
       .then((response) => {
         this.setState({
           glumac: response.data,
-          trenutnaSlika: response.data.slika,
         });
         console.log(response.data);
       })

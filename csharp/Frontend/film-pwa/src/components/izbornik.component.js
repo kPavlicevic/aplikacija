@@ -58,7 +58,7 @@ export default class Izbornik extends Component {
           </Navbar.Collapse>
           {prijavljen &&
             <div>
-              Prijavljen kao: {korisnickoIme}
+              Prijavljen: {korisnickoIme}
             </div>
           }
         </Container>

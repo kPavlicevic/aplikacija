@@ -17,6 +17,7 @@ export default function App() {
   const [auth, setAuth] = useState(JSON.parse(localStorage.getItem("auth")));
   
   return (
+    <div className="pozadina">
       <Router>
         <Izbornik auth={auth}/>
         <Routes>
@@ -31,5 +32,6 @@ export default function App() {
           <Route path="/registracija" element={<Prijava tip={REGISTER} />} />
         </Routes>
       </Router>
+    </div>
   );
 }

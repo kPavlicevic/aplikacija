@@ -12,13 +12,15 @@ import OcjenaService from "../../services/ocjena.service";
 import KomentarService from "../../services/komentar.service";
 import { FaEdit, FaMinus, FaTrash } from "react-icons/fa";
 import PoveziGlumca from "./poveziGlumca.component";
+import SlikeService from "../../services/slike.service";
 
 export default class PromjeniFilm extends Component {
   constructor(props) {
     super(props);
     this.film = this.dohvatiFilm();
     this.prosjek = this.dohvatiProsjek();
-    
+    this.trenutnaSlika = this.dohvatiSlikuFilma();
+
     this.obrisiGlumca = this.obrisiGlumca.bind(this);
 
     this.handlePromjena = this.handlePromjena.bind(this);
@@ -41,6 +43,8 @@ export default class PromjeniFilm extends Component {
     this.zatvoriModal = this.zatvoriModal.bind(this);
     this.otvoriModal = this.otvoriModal.bind(this);
 
+    this.spremiSliku = this.spremiSliku.bind(this);
+
     this.state = {
       film: {},
       glumci: [],
@@ -52,6 +56,7 @@ export default class PromjeniFilm extends Component {
       },
       prosjek: 0,
       trenutniKomentar: {},
+      trenutnaSlika: "",
     };
   }
 
@@ -68,6 +73,61 @@ export default class PromjeniFilm extends Component {
       .catch((e) => {
         console.log(e);
       });
+  }
+
+  async dohvatiProsjek() {
+    let href = window.location.href;
+    let niz = href.split("/");
+    let sifraFilma = niz[niz.length - 1];
+    await OcjenaService.getProsjek(sifraFilma)
+      .then((response) => {
+        this.setState({
+          prosjek: response.data,
+        });
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+
+  async dohvatiSlikuFilma() {
+    let href = window.location.href;
+    let niz = href.split("/");
+    let sifraFilma = niz[niz.length - 1];
+    const odgovor = await SlikeService.getSlikuFilmaPoSifri(sifraFilma);
+    if (odgovor.ok) {
+      this.setState({
+        trenutnaSlika: "data:image/png;base64," + odgovor.slika,
+      });
+    } else {
+      console.log(odgovor.poruka);
+      this.setState({
+        trenutnaSlika: noimage,
+      });
+    }
+  }
+
+  spremiSlikuAkcija=() => {
+    const { film } = this.state;
+
+    this.spremiSliku(film.sifra);
+  }
+
+  async spremiSliku(sifra) {
+    const file = document.getElementById("file").files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("Vrsta", 1);
+    formData.append("SifraVeze", sifra);
+    const odgovor = await SlikeService.postaviSliku(formData);
+    if (odgovor.ok) {
+      //window.location.href='/polaznici';
+      this.dohvatiSlikuFilma();
+    } else {
+      // pokaži grešku
+      alert(odgovor.poruka);
+      console.log(odgovor);
+    }
   }
 
   async dohvatiGlumci() {
@@ -95,21 +155,6 @@ export default class PromjeniFilm extends Component {
     } else {
       alert(odgovor.poruka);
     }
-  }
-
-  async dohvatiProsjek() {
-    let href = window.location.href;
-    let niz = href.split("/");
-    let sifraFilma = niz[niz.length - 1];
-    await OcjenaService.getProsjek(sifraFilma)
-      .then((response) => {
-        this.setState({
-          prosjek: response.data,
-        });
-      })
-      .catch((e) => {
-        console.log(e);
-      });
   }
 
   async promjeniFilm(film) {
@@ -295,14 +340,20 @@ export default class PromjeniFilm extends Component {
   }
 
   render() {
-    const { film, modal, prosjek } = this.state;
+    const { film, modal, prosjek, trenutnaSlika, trenutniKomentar } = this.state;
 
     return (
       <>
         <Container>
           <Row>
             <Col md={6} lg={5}>
-              <img src={noimage} className="imgKontejner" alt="slika filma" />
+              <img
+                src={trenutnaSlika}
+                className="imgKontejner border"
+                alt="slika filma"
+                width={360}
+                height={250}
+              />
             </Col>
             <Col>
               <ul>
@@ -312,13 +363,18 @@ export default class PromjeniFilm extends Component {
                 <li>Žanr: {film.zanr}</li>
                 <li>
                   <div className="kontejner">
-                    Glumci:{" "}
-                    <PoveziGlumca film={film.sifra}/>
+                    Glumci: <PoveziGlumca film={film.sifra} />
                   </div>
                   {film.glumci &&
                     film.glumci.map((glumac) => (
                       <div key={glumac.sifra} className="glumciFilm">
-                        <Button variant="danger" size="sm" onClick={() => this.obrisiGlumca(film.sifra, glumac.sifra)}>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() =>
+                            this.obrisiGlumca(film.sifra, glumac.sifra)
+                          }
+                        >
                           <FaMinus />
                         </Button>
                         <Link to={"/glumci/" + glumac.sifra}>
@@ -428,7 +484,15 @@ export default class PromjeniFilm extends Component {
                     defaultValue={film.zanr}
                   />
                 </Form.Group>
+                <Row style={{ margin: "10px", gap: "10px" }}>
+                  <input type="file" id="file" onChange={this.onChange} />
 
+                  <input
+                    type="button"
+                    onClick={this.spremiSlikuAkcija}
+                    value={"Spemi sliku"}
+                  />
+                </Row>
                 <Row>
                   <Col>
                     <Button
@@ -523,26 +587,39 @@ export default class PromjeniFilm extends Component {
           </Modal.Body>
         </Modal>
 
-        {/*Modal dodaj glumca*/}
-        <Modal show={modal.dodajGlumca}>
-          <Modal.Title>
-            {modal.ime} {modal.prezime} - dodavanje
-          </Modal.Title>
+        {/*Modal komentiraj*/}
+        <Modal show={modal.urediKomentar}>
           <Modal.Body>
-            <Form onSubmit={this.dodajGlumca}>
-              <Form.Group className="mb-3" controlId="dodajGlumca">
-                <Form.Label>Dodaj glumca</Form.Label>
+            <Form onSubmit={this.handleUrediKomentar}>
+              <Form.Group className="mb-3" controlId="komentar">
+                <Form.Label>Komentar</Form.Label>
+                <Form.Control
+                  type="text"
+                  as="textarea"
+                  name="komentar"
+                  placeholder="Komentiraj"
+                  defaultValue={trenutniKomentar.sadrzaj}
+                  maxLength={250}
+                  required
+                />
               </Form.Group>
+              <Row>
+                <Col>
+                  <Button
+                    className="btn btn-danger gumb"
+                    onClick={this.zatvoriModal}
+                  >
+                    Odustani
+                  </Button>
+                </Col>
+                <Col>
+                  <Button variant="primary" className="gumb" type="submit">
+                    Komentiraj
+                  </Button>
+                </Col>
+              </Row>
             </Form>
           </Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="primary"
-              onClick={() => this.dodajGlumca(modal.id)}
-            >
-              Dodaj
-            </Button>
-          </Modal.Footer>
         </Modal>
       </>
     );

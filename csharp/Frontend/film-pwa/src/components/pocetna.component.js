@@ -28,11 +28,11 @@ export default class Pocetna extends Component {
             na razumijevanju.
           </p>
           <div className="naslovna_linkovi">
-          <Link to="/prijava" className="btn btn-primary"> 
-            Prijava
+          <Link to="/filmovi" className="btn btn-primary"> 
+            Pregled filmova
           </Link>
-          <Link to="/registracija" className="btn btn-primary">
-            Registracija
+          <Link to="/glumci" className="btn btn-primary">
+            Pregled glumaca
           </Link>
           </div>
       </Container>

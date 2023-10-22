@@ -22,6 +22,7 @@ export default class Izbornik extends Component {
     console.log("odjavljujem se");
     localStorage.setItem("auth", JSON.stringify(AUTH));
     this.setState(AUTH);
+    window.location.reload();
   }
 
   render() {
@@ -55,6 +56,11 @@ export default class Izbornik extends Component {
               </NavDropdown>
             </Nav>
           </Navbar.Collapse>
+          {prijavljen &&
+            <div>
+              Prijavljen kao: {korisnickoIme}
+            </div>
+          }
         </Container>
       </Navbar>
     );

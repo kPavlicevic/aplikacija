@@ -69,3 +69,7 @@ code {
   gap: 10px;
   margin-bottom: 5px;
 }
+
+.border{
+  border: 1px solid black;
+}

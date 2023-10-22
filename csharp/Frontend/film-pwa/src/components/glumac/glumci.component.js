@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import GlumacDataService from "../../services/glumac.service";
+import SlikaService from "../../services/slike.service";
 import { Button, Card, CardBody, Col, Container, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa";
 import { Modal } from "react-bootstrap";
+import http from "../../http-common";
 
 import noimage from "../../images/no-image-found-360x250.png";
-import http from "../../http-common";
 
 export default class Glumci extends Component {
   constructor(props) {
@@ -52,7 +53,7 @@ export default class Glumci extends Component {
   }
 
   dohvatiSlikeGlumaca() {
-    GlumacDataService.getSlikeGlumaca()
+    SlikaService.getSlikeGlumaca()
       .then((response) => {
         this.setState({
           slike: response.data,
@@ -91,23 +92,6 @@ export default class Glumci extends Component {
     this.zatvoriModal();
   }
 
-  // async dodajSliku() {
-  //   const file = document.getElementById("file").files[0];
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-  //   formData.append("Vrsta", 2);
-  //   formData.append("SifraVeze", 5);
-  //   const config = {
-  //     headers: {
-  //       "Content-Type": "multipart/form-data",
-  //     },
-  //   };
-  //   const odgovor = await http.post("/Slika", formData, config);
-  //   if(odgovor.status === 200){
-  //     alert("slika uspješno spremljena, osvježite");
-  //   }
-  // }
-
   render() {
     const { glumci } = this.state;
     const { modal } = this.state;
@@ -120,7 +104,7 @@ export default class Glumci extends Component {
           {glumci &&
             glumci.map((g) => (
               <Col key={g.sifra} sm={12} lg={4} md={6}>
-                <Card style={{ width: "18rem" }}>
+                <Card style={{ width: "18rem", margin:"5px" }}>
                   {this.nadjiSlikuGlumca(g.sifra)}
                   <Card.Body>
                     <Card.Title>
@@ -151,9 +135,6 @@ export default class Glumci extends Component {
               </Col>
             ))}
         </Row>
-
-        <input type="file" id="file" />
-        {/* <Button onClick={this.dodajSliku}>Spremit sliku</Button> */}
 
         <Modal show={this.state.prikaziModal} onHide={this.zatvoriModal}>
           <Modal.Header closeButton>

@@ -2,6 +2,7 @@
 using FilmRecenzijaApp.Models.DTO;
 using FilmRecenzijaApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
 
 namespace FilmRecenzijaApp.Controllers
 {
@@ -25,11 +26,12 @@ namespace FilmRecenzijaApp.Controllers
             }
             try
             {
+                
                 var slika = _context.Slika
                     .FirstOrDefault(s => s.SifraVeze == sifra && s.Vrsta == vrsta);
 
                 if (slika == null) {
-                    return NoContent();
+                    return BadRequest("Slika ne postoji");
                 }
 
                 SlikaDTO vrati = new SlikaDTO
@@ -96,6 +98,9 @@ namespace FilmRecenzijaApp.Controllers
 
             try
             {
+                var slika = _context.Slika
+                   .FirstOrDefault(s => s.SifraVeze == SifraVeze && s.Vrsta == Vrsta);
+
                 using (var memoryStream = new MemoryStream())
                 { 
                     file.CopyTo(memoryStream);
@@ -105,8 +110,17 @@ namespace FilmRecenzijaApp.Controllers
                         SifraVeze = SifraVeze,
                         Bitovi = bitovi,
                     };
-                    _context.Slika.Add(s);
-                    _context.SaveChanges();
+                    if (slika == null)
+                    {
+                        _logger.LogInformation("dodajem");
+                        _context.Slika.Add(s);
+                    }
+                    else {
+                        slika.Bitovi = bitovi;
+                        _logger.LogInformation("updateam");
+                        _context.Slika.Update(slika);
+                    }
+                        _context.SaveChanges();
                 }
                 return Ok();
             }

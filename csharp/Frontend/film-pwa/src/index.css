@@ -5,14 +5,14 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #C2B4D6  
+  background-color: #b2aabd  
 }
 
 .bg-body-tertiary{
   position: sticky;
   top:0;
-  z-index:9999;
-  background-color: #57648C !important;
+  z-index:10;
+  background-color: #737886 !important;
   margin-bottom: 12px;
 }
 

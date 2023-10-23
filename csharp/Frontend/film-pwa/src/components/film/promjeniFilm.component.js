@@ -229,7 +229,13 @@ export default class PromjeniFilm extends Component {
     const korisnickoIme = JSON.parse(
       localStorage.getItem("auth")
     )?.korisnickoIme;
-    this.obrisiOcjenu(sifraFilma, korisnickoIme);
+
+    if(korisnickoIme === "") {
+      alert("Morate biti prijavljeni da biste mogli ocijeniti film!")
+      return;
+    }else {
+      this.obrisiOcjenu(sifraFilma, korisnickoIme);
+    }
   }
 
   async komentiraj(komentarDto) {

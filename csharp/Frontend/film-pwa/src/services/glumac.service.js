@@ -11,7 +11,7 @@ class GlumacDataService {
 
   async delete(sifra) {
     const odgovor = await http
-      .delete("/Glumac" + sifra)
+      .delete("/Glumac/" + sifra)
       .then((response) => {
         return { ok: true, poruka: "Uspješno obrisano!" };
       })

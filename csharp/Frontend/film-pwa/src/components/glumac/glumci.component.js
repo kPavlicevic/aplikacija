@@ -148,7 +148,7 @@ export default class Glumci extends Component {
           </Modal.Body>
           <Modal.Footer>
             <Button
-              variant="danger"
+              variant="danger" disabled
               onClick={() => this.obrisiGlumac(modal.id)}
             >
               Obriši
